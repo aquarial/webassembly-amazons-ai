@@ -62,8 +62,8 @@ let animations = [];
   canvas.onmousemove = (function (event) {
     let tilesize = canvas.width / gameboard.width;
 
-    let tx = event.offsetX / tilesize;
-    let ty = event.offsetY / tilesize;
+    let tx = Math.floor(event.offsetX / tilesize) + 1;
+    let ty = Math.floor(event.offsetY / tilesize) + 1;
     if (drawstate.tilex != tx || drawstate.tiley != ty) {
       drawstate.tilex = tx;
       drawstate.tiley = ty;
