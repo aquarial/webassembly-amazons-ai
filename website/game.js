@@ -39,7 +39,26 @@ export class GameBoard {
      * @param {number} x
      */
     atPos(y, x) {
-       return  this.blocked.get(`${y} ${x}`)
+        return this.blocked.get(`${y} ${x}`)
+    }
+
+    openLineTo(y0, x0, y1, x1) {
+        if (y0 == y1 && x0 == x1) {
+            return false; // can't be same point
+        }
+        if (y0 != y1 && x0 != x1 && Math.abs(y1 - y0) != Math.abs(x1 - x0)) {
+            return false; // not a line
+        }
+
+        let distance = Math.max(Math.abs(y1 - y0), Math.abs(x1 - x0));
+
+        for (let dt = 1; dt <= distance; dt++) {
+            if (this.atPos(y0 + dt * (y1 - y0), x0 + dt * (x1 - x0))) {
+                return false;
+            }
+        }
+        
+        return true;
     }
 
     /**
