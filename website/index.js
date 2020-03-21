@@ -9,6 +9,30 @@ let animations = [];
 
 
 {
+  /**
+   * @param {CanvasRenderingContext2D} c2d
+   * @param {GameBoard} gameboard
+   */
+  function drawTiles(c2d, gameboard) {
+    let tilesize = canvas.width / gameboard.width;
+    let checker_colors = ["brown", "gray"]
+  
+    for (let y = 1; y <= gameboard.height; y++) {
+      for (let x = 1; x <= gameboard.width; x++) {
+        c2d.fillStyle = checker_colors[(x + y) % 2]
+        c2d.fillRect((x - 1) * tilesize, (y - 1) * tilesize, tilesize, tilesize)
+
+        let at = gameboard.atPos(y, x)
+        if (at instanceof Player) {
+          c2d.fillStyle = at.team
+          c2d.beginPath();
+          c2d.ellipse((x - 1 + 0.5) * tilesize, (y - 1 + 0.5) * tilesize,
+            tilesize * 0.3, tilesize * 0.3, 0, 0, 360);
+          c2d.fill();
+        }
+      }
+    }
+  }
 
   /** @type {HTMLCanvasElement} */
   let canvas = (document.getElementById("thecanvas"));
@@ -20,16 +44,12 @@ let animations = [];
   gameboard.addPlayer(new Player(6, 3, "blue"));
   gameboard.addPlayer(new Player(6, 6, "blue"));
 
-  let tilesize = canvas.width / gameboard.width;
-  let checker_colors = ["brown", "gray"]
+  drawTiles(c2d, gameboard);
 
-  for (let y = 1; y <= gameboard.height; y++) {
-    for (let x = 1; x <= gameboard.width; x++) {
-      c2d.fillStyle = checker_colors[(x + y) % 2]
-      c2d.fillRect((x - 1) * tilesize, (y - 1) * tilesize, tilesize, tilesize)
-    }
-  }
-
+  let lasttile = [false, -1, -1]
+  canvas.onmousemove = (function (event) {
+    
+  })
   animations.push((dt, totaltime) => {
 
   })
