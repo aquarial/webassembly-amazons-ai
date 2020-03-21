@@ -2,7 +2,7 @@
 /* jshint -W069, esversion:6 */
 
 import * as wasm from "amazons-ai-webassembly";
-import { GameBoard, Player } from "./board.js";
+import { GameBoard, Player } from "./game.js";
 import { DrawState } from "./drawstate.js";
 
 /** @type {((dt: number, totaltime: number) => void)[]} */
@@ -60,8 +60,9 @@ let animations = [];
   })
   animations.push((dt, totaltime) => {
     if (cache.redrawboard) {
-      drawTiles(c2d, gameboard);
       cache.redrawboard = false;
+      drawTiles(c2d, gameboard);
+
     }
   })
 }
