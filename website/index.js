@@ -25,17 +25,17 @@ let animations = [];
 
         let at = gameboard.atPos(y, x)
         if (at instanceof Player) {
-          c2d.beginPath();
           if (at.selected) {
-            console.log("Selected", y, x);
+            c2d.beginPath();
             c2d.fillStyle = "gray"
             c2d.ellipse((x - 1 + 0.5) * tilesize, (y - 1 + 0.5) * tilesize,
               (tilesize * 1.4) * 0.3, (tilesize * 1.4) * 0.3, 0, 0, 360);
-          } else {
-            c2d.fillStyle = "white"
-            c2d.ellipse((x - 1 + 0.5) * tilesize, (y - 1 + 0.5) * tilesize,
-              (tilesize * 1.1) * 0.3, (tilesize * 1.1) * 0.3, 0, 0, 360);
+            c2d.fill();
           }
+          c2d.beginPath();
+          c2d.fillStyle = "white"
+          c2d.ellipse((x - 1 + 0.5) * tilesize, (y - 1 + 0.5) * tilesize,
+            (tilesize * 1.1) * 0.3, (tilesize * 1.1) * 0.3, 0, 0, 360);
           c2d.fill();
           c2d.fillStyle = at.team
           c2d.beginPath();
