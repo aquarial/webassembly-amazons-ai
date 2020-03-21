@@ -15,7 +15,7 @@ export class Player {
     }
 
     pos() {
-        return [this.y, this.x]
+        return `${this.y} ${this.x}`
     }
 }
 
@@ -29,8 +29,16 @@ export class GameBoard {
     constructor(width, height) {
         this.width = width
         this.height = height
-        /** @type {Map<Number[],Boolean|Player>} */
+        /** @type {Map<string,Boolean|Player>} */
         this.blocked = new Map()
+    }
+
+    /**
+     * @param {number} y
+     * @param {number} x
+     */
+    atPos(y, x) {
+       return  this.blocked.get(`${y} ${x}`)
     }
 
     /**
