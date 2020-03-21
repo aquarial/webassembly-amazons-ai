@@ -2,39 +2,40 @@
 /* jshint -W069, esversion:6 */
 
 import * as wasm from "amazons-ai-webassembly";
-import { GameBoard } from "./board.js";
+import { GameBoard, Player } from "./board.js";
 
+/** @type {((dt: number, totaltime: number) => void)[]} */
 let animations = [];
 
-let canvas = /** @type {HTMLCanvasElement} */ (document.getElementById("thecanvas"));
-let c2d = canvas.getContext("2d");
+let gameboard = new GameBoard(8, 8);
+gameboard.addPlayer(new Player(3, 3, "red"));
+gameboard.addPlayer(new Player(3, 6, "red"));
+gameboard.addPlayer(new Player(6, 3, "blue"));
+gameboard.addPlayer(new Player(6, 6, "blue"));
 
-c2d.fillStyle = "black"
-c2d.fillRect(0, 0, canvas.width, canvas.height)
+{
+  let marker = 0;
+  animations.push((dt, totaltime) => {
+    if (totaltime > marker) {
+      //console.log(marker, "seconds");
+      marker += 5;
+    }
+  });
+}
 
-let gameboard = new GameBoard();
-
-
-let time = 0;
-let marker = 0;
-/** @param {number} dt */
-animations.push(dt => {
-  time += dt;
-  if (time > marker) {
-    //console.log(marker, "seconds");
-    marker += 5;
-  }
-});
 
 
 let previous = performance.now();
+let totaltime = 0;
+
 function animLoop() {
   let next = performance.now();
   let deltaTime = (next - previous) / 1000.0;
+  totaltime += deltaTime;
   previous = next;
 
   animations.forEach(it => {
-    it(deltaTime);
+    it(deltaTime, totaltime);
   });
 
   window.requestAnimationFrame(animLoop);
