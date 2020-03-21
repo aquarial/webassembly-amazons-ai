@@ -12,9 +12,10 @@ let animations = [];
 {
   /**
    * @param {CanvasRenderingContext2D} c2d
+   * @param {DrawState} drawstate
    * @param {GameBoard} gameboard
    */
-  function drawTiles(c2d, gameboard) {
+  function drawTiles(c2d, drawstate, gameboard) {
     let tilesize = canvas.width / gameboard.width;
     let checker_colors = ["#eae8ea", "#c1c1c1"]
 
@@ -25,7 +26,7 @@ let animations = [];
 
         let at = gameboard.atPos(y, x)
         if (at instanceof Player) {
-          if (at.selected) {
+          if (at == drawstate.piece) {
             c2d.beginPath();
             c2d.fillStyle = "gray"
             c2d.ellipse((x - 1 + 0.5) * tilesize, (y - 1 + 0.5) * tilesize,
@@ -82,11 +83,9 @@ let animations = [];
 
     let at = gameboard.atPos(ty, tx)
     if (at instanceof Player) {
-      if (drawstate.piece != null)
-        drawstate.piece.selected = false;
+      drawstate.piece = null;
       if (at.team === gamestate.next_to_go) {
         drawstate.piece = at;
-        at.selected = true;
       }
       drawstate.move = null;
       drawstate.stone = null;
@@ -101,7 +100,6 @@ let animations = [];
           drawstate.move = [ty, tx];
         } else {
           console.log("Invalid move")
-          drawstate.piece.selected = false;
           drawstate.piece = null;
         }
       } else if (drawstate.stone == null) {
@@ -110,10 +108,12 @@ let animations = [];
           gameboard.blocked.set(drawstate.piece.pos(), drawstate.piece);
           drawstate.stone = [ty, tx];
           console.log("Move from", drawstate.piece, drawstate.move, drawstate.stone);
+          drawstate.piece = null;
+          drawstate.move = null;
+          drawstate.stone = null;
         } else {
           gameboard.blocked.set(drawstate.piece.pos(), drawstate.piece);
           console.log("Invalid stone")
-          drawstate.piece.selected = false;
           drawstate.piece = null;
           drawstate.move = null;
         }
@@ -126,7 +126,7 @@ let animations = [];
   animations.push((dt, totaltime) => {
     if (drawstate.redrawboard) {
       drawstate.redrawboard = false;
-      drawTiles(c2d, gameboard);
+      drawTiles(c2d, drawstate, gameboard);
     }
   })
 }

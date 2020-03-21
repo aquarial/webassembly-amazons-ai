@@ -12,7 +12,6 @@ export class Player {
         this.x = x
         this.y = y
         this.team = team
-        this.selected = false;
     }
 
     pos() {
