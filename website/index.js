@@ -57,6 +57,9 @@ let animations = [];
   gameboard.addPlayer(new Player(6, 3, "blue"));
   gameboard.addPlayer(new Player(6, 6, "blue"));
 
+
+  let gamestate = new GameState();
+
   let drawstate = new DrawState();
 
   canvas.onmousemove = (function (event) {
@@ -71,6 +74,29 @@ let animations = [];
     }
   })
 
+  canvas.onmousedown = function (event) {
+    let tilesize = canvas.width / gameboard.width;
+
+    let tx = Math.floor(event.offsetX / tilesize) + 1;
+    let ty = Math.floor(event.offsetY / tilesize) + 1;
+
+    let at = gameboard.atPos(ty, tx)
+    if (at instanceof Player && at.team === gamestate.next_to_go) {
+        if (drawstate.piece != null)
+          drawstate.piece.selected = false;
+        drawstate.piece = at;
+        at.selected = true;
+        drawstate.move = null;
+        drawstate.stone = null;  
+    }
+
+    if (at == undefined) {
+      
+    }
+
+
+    drawstate.redrawboard = true;
+  }
   animations.push((dt, totaltime) => {
     if (drawstate.redrawboard) {
       drawstate.redrawboard = false;
