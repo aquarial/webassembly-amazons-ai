@@ -1,7 +1,7 @@
 /*jshint esversion: 6 */
 // @ts-check
 
-export class Cache {
+export class DrawState {
     constructor() {
         this.redrawboard = true
 

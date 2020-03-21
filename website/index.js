@@ -3,7 +3,7 @@
 
 import * as wasm from "amazons-ai-webassembly";
 import { GameBoard, Player } from "./board.js";
-import { Cache } from "./cache.js";
+import { DrawState } from "./drawstate.js";
 
 /** @type {((dt: number, totaltime: number) => void)[]} */
 let animations = [];
@@ -45,7 +45,7 @@ let animations = [];
   gameboard.addPlayer(new Player(6, 3, "blue"));
   gameboard.addPlayer(new Player(6, 6, "blue"));
 
-  let cache = new Cache();
+  let cache = new DrawState();
 
   canvas.onmousemove = (function (event) {
     let tilesize = canvas.width / gameboard.width;
