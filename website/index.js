@@ -16,7 +16,7 @@ let animations = [];
    */
   function drawTiles(c2d, gameboard) {
     let tilesize = canvas.width / gameboard.width;
-    let checker_colors = ["brown", "gray"]
+    let checker_colors = ["#eae8ea", "#c1c1c1"]
 
     for (let y = 1; y <= gameboard.height; y++) {
       for (let x = 1; x <= gameboard.width; x++) {
@@ -25,6 +25,11 @@ let animations = [];
 
         let at = gameboard.atPos(y, x)
         if (at instanceof Player) {
+          c2d.fillStyle = "white"
+          c2d.beginPath();
+          c2d.ellipse((x - 1 + 0.5) * tilesize, (y - 1 + 0.5) * tilesize,
+            (tilesize*1.1) * 0.3, (tilesize*1.1) * 0.3, 0, 0, 360);
+          c2d.fill();
           c2d.fillStyle = at.team
           c2d.beginPath();
           c2d.ellipse((x - 1 + 0.5) * tilesize, (y - 1 + 0.5) * tilesize,
@@ -45,24 +50,24 @@ let animations = [];
   gameboard.addPlayer(new Player(6, 3, "blue"));
   gameboard.addPlayer(new Player(6, 6, "blue"));
 
-  let cache = new DrawState();
+  let drawstate = new DrawState();
 
   canvas.onmousemove = (function (event) {
     let tilesize = canvas.width / gameboard.width;
 
     let tx = event.offsetX / tilesize;
     let ty = event.offsetY / tilesize;
-    if (cache.tilex != tx || cache.tiley != ty) {
-      cache.tilex = tx;
-      cache.tiley = ty;
-      cache.redrawboard = true;
+    if (drawstate.tilex != tx || drawstate.tiley != ty) {
+      drawstate.tilex = tx;
+      drawstate.tiley = ty;
+      drawstate.redrawboard = true;
     }
   })
-  animations.push((dt, totaltime) => {
-    if (cache.redrawboard) {
-      cache.redrawboard = false;
-      drawTiles(c2d, gameboard);
 
+  animations.push((dt, totaltime) => {
+    if (drawstate.redrawboard) {
+      drawstate.redrawboard = false;
+      drawTiles(c2d, gameboard);
     }
   })
 }
