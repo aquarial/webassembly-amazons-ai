@@ -2,11 +2,18 @@
 /* jshint -W069, esversion:6 */
 
 import * as wasm from "amazons-ai-webassembly";
+import { GameBoard } from "./board.js";
 
 let animations = [];
 
 let canvas = /** @type {HTMLCanvasElement} */ (document.getElementById("thecanvas"));
 let c2d = canvas.getContext("2d");
+
+c2d.fillStyle = "black"
+c2d.fillRect(0, 0, canvas.width, canvas.height)
+
+let gameboard = new GameBoard();
+
 
 let time = 0;
 let marker = 0;
@@ -14,7 +21,7 @@ let marker = 0;
 animations.push(dt => {
   time += dt;
   if (time > marker) {
-    console.log(marker, "seconds");
+    //console.log(marker, "seconds");
     marker += 5;
   }
 });
