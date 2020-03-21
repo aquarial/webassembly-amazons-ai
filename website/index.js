@@ -3,6 +3,7 @@
 
 import * as wasm from "amazons-ai-webassembly";
 import { GameBoard, Player } from "./board.js";
+import { Cache } from "./cache.js";
 
 /** @type {((dt: number, totaltime: number) => void)[]} */
 let animations = [];
@@ -16,7 +17,7 @@ let animations = [];
   function drawTiles(c2d, gameboard) {
     let tilesize = canvas.width / gameboard.width;
     let checker_colors = ["brown", "gray"]
-  
+
     for (let y = 1; y <= gameboard.height; y++) {
       for (let x = 1; x <= gameboard.width; x++) {
         c2d.fillStyle = checker_colors[(x + y) % 2]
@@ -44,14 +45,24 @@ let animations = [];
   gameboard.addPlayer(new Player(6, 3, "blue"));
   gameboard.addPlayer(new Player(6, 6, "blue"));
 
-  drawTiles(c2d, gameboard);
+  let cache = new Cache();
 
-  let lasttile = [false, -1, -1]
   canvas.onmousemove = (function (event) {
-    
+    let tilesize = canvas.width / gameboard.width;
+
+    let tx = event.offsetX / tilesize;
+    let ty = event.offsetY / tilesize;
+    if (cache.tilex != tx || cache.tiley != ty) {
+      cache.tilex = tx;
+      cache.tiley = ty;
+      cache.redrawboard = true;
+    }
   })
   animations.push((dt, totaltime) => {
-
+    if (cache.redrawboard) {
+      drawTiles(c2d, gameboard);
+      cache.redrawboard = false;
+    }
   })
 }
 
