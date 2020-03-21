@@ -12,6 +12,7 @@ export class Player {
         this.x = x
         this.y = y
         this.team = team
+        this.selected = false;
     }
 
     pos() {
@@ -29,7 +30,7 @@ export class GameBoard {
     constructor(width, height) {
         this.width = width
         this.height = height
-        /** @type {Map<string,Boolean|Player>} */
+        /** @type {Map<string,Object|Player>} */
         this.blocked = new Map()
     }
 
@@ -46,5 +47,12 @@ export class GameBoard {
      */
     addPlayer(player) {
         this.blocked.set(player.pos(), player)
+    }
+}
+
+
+export class GameState {
+    constructor() {
+        this.next_to_go = "red"
     }
 }
