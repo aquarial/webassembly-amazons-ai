@@ -81,17 +81,43 @@ let animations = [];
     let ty = Math.floor(event.offsetY / tilesize) + 1;
 
     let at = gameboard.atPos(ty, tx)
-    if (at instanceof Player && at.team === gamestate.next_to_go) {
-        if (drawstate.piece != null)
-          drawstate.piece.selected = false;
+    if (at instanceof Player) {
+      if (drawstate.piece != null)
+        drawstate.piece.selected = false;
+      if (at.team === gamestate.next_to_go) {
         drawstate.piece = at;
         at.selected = true;
-        drawstate.move = null;
-        drawstate.stone = null;  
+      }
+      drawstate.move = null;
+      drawstate.stone = null;
     }
 
     if (at == undefined) {
-      
+      if (drawstate.piece == null) {
+        // make pieces flash
+        console.log("No Piece selected!")
+      } else if (drawstate.move == null) {
+        if (gameboard.openLineTo(drawstate.piece.y, drawstate.piece.x, ty, tx)) {
+          drawstate.move = [ty, tx];
+        } else {
+          console.log("Invalid move")
+          drawstate.piece.selected = false;
+          drawstate.piece = null;
+        }
+      } else if (drawstate.stone == null) {
+        gameboard.blocked.set(drawstate.piece.pos(), undefined);
+        if (gameboard.openLineTo(drawstate.move[0], drawstate.move[1], ty, tx)) {
+          gameboard.blocked.set(drawstate.piece.pos(), drawstate.piece);
+          drawstate.stone = [ty, tx];
+          console.log("Move from", drawstate.piece, drawstate.move, drawstate.stone);
+        } else {
+          gameboard.blocked.set(drawstate.piece.pos(), drawstate.piece);
+          console.log("Invalid stone")
+          drawstate.piece.selected = false;
+          drawstate.piece = null;
+          drawstate.move = null;
+        }
+      }
     }
 
 
