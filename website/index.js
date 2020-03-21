@@ -2,7 +2,7 @@
 /* jshint -W069, esversion:6 */
 
 import * as wasm from "amazons-ai-webassembly";
-import { GameBoard, Player } from "./game.js";
+import { GameBoard, Player, GameState } from "./game.js";
 import { DrawState } from "./drawstate.js";
 
 /** @type {((dt: number, totaltime: number) => void)[]} */
