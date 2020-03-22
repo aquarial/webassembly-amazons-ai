@@ -111,7 +111,8 @@ let animations = [];
         if (gameboard.openLineTo(drawstate.move, tpos)) {
           gameboard.blocked.set(drawstate.piece.pos.str(), drawstate.piece);
           drawstate.stone = tpos;
-          console.log("Move from", drawstate.piece, drawstate.move, drawstate.stone);
+          gameboard.makePlayerMove(drawstate.piece, drawstate.move, drawstate.stone)
+          gamestate.addMove(drawstate.piece, drawstate.move, drawstate.stone)
           drawstate.piece = null;
           drawstate.move = null;
           drawstate.stone = null;

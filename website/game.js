@@ -97,10 +97,36 @@ export class GameBoard {
     addPlayer(player) {
         this.blocked.set(player.pos.str(), player)
     }
+
+    /**
+     * @param {Player} player
+     * @param {Pos} move
+     * @param {Pos} stone
+     */
+    makePlayerMove(player, move, stone) {
+        this.blocked.set(player.pos.str(), undefined)
+        this.blocked.set(move.str(), player)
+        player.pos.y = move.y
+        player.pos.x = move.x
+        this.blocked.set(stone.str(), 1)
+    }
 }
 
 
 export class GameState {
+
+    /**
+     * @param {Player} player
+     * @param {Pos} move
+     * @param {Pos} stone
+     */
+    addMove(player, move, stone) {
+        if (this.next_to_go == "red") {
+            this.next_to_go = 'blue'
+        } else {
+            this.next_to_go = "red"
+        }
+    }
     constructor() {
         this.next_to_go = "red"
     }
