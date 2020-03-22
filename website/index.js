@@ -87,12 +87,21 @@ let animations = [];
 
     let at = gameboard.atPos(tpos);
     if (at instanceof Player) {
-      drawstate.piece = null;
-      if (at.team === gamestate.next_to_go) {
-        drawstate.piece = at;
+      if (at === drawstate.piece && drawstate.move != null && drawstate.stone == null) {
+        // placing a stone on the location of the moving piece
+        gameboard.makePlayerMove(drawstate.piece, drawstate.move, tpos)
+        gamestate.addMove(drawstate.piece, drawstate.move, tpos)
+        drawstate.piece = null
+        drawstate.move = null;
+      } else {
+        drawstate.piece = null;
+        if (at.team === gamestate.next_to_go) {
+          drawstate.piece = at;
+        }
+        drawstate.move = null;
+        drawstate.stone = null;
+
       }
-      drawstate.move = null;
-      drawstate.stone = null;
     }
 
     if (at == undefined) {
