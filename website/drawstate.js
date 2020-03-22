@@ -52,7 +52,7 @@ export class DrawState {
           c2d.fill();
         } else if (at != undefined) {
           c2d.fillStyle = '#303030'
-          c2d.fillRect((x - 1 + 0.3) * tilesize, (y - 1 + 0.3) * tilesize, tilesize * 0.4, tilesize * 0.4)
+          c2d.fillRect((x - 1 + 0.2) * tilesize, (y - 1 + 0.2) * tilesize, tilesize * 0.6, tilesize * 0.6)
         }
       }
     }
