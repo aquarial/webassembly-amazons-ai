@@ -27,8 +27,10 @@ let animations = [];
 
   /** @type {HTMLButtonElement} */
   let undo = (document.getElementById("undo"));
-  undo.onmousedown = function(event) {
+  undo.onmousedown = function (event) {
     gamestate.undoMove(gameboard);
+    drawstate.piece = null;
+    drawstate.move = null;
   }
   /** @type {HTMLButtonElement} */
   let makeai = (document.getElementById("makeai"));
