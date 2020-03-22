@@ -79,7 +79,7 @@ pub fn compute_ai_move(rb: &RequestedBoard) -> ReturnedMove {
   for &(y,x) in &rb.red_team {
     players.push(Player{ team:Team::Red, pos:Pos {row:  y as i8, col:  x as i8} });
   }
-  let mut board = Board::new(rb.size as i8, players);
+  let mut board = Board::new(rb.size as i8 + 2, players);
   for &(y,x) in &rb.blocks {
     board.wall_set(Pos {row:y as i8,col:x as i8}, true);
   }
