@@ -133,7 +133,7 @@ export class GameState {
     this.next_to_go = "red"
   }
 
-  undoMove(gameboard) {
+  undoMove(gameboard, ai=true) {
     let v = this.history.pop()
 
     if (v != undefined) {
@@ -149,8 +149,8 @@ export class GameState {
       gameboard.blocked.set(v.move.str(), undefined)
       player.pos.y = v.player.y
       player.pos.x = v.player.x
-      if (v.ai) {
-        this.undoMove(gameboard);
+      if (v.ai && ai) {
+        this.undoMove(gameboard, false);
       }
     }
   }
