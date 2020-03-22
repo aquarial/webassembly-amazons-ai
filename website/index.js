@@ -36,13 +36,12 @@ let animations = [];
   let makeai = (document.getElementById("makeai"));
   makeai.onmousedown = function (event) {
     let board = wasm.RequestedBoard.new();
-    board.width = gameboard.width;
-    board.height = gameboard.height;
+    board.size = gameboard.width;
     for (let y = 1; y <= gameboard.height; y++) {
       for (let x = 1; x <= gameboard.width; x++) {
         let at = gameboard.atYX(y, x);
         if (at instanceof Player) {
-          if (at.team == "red") {
+          if (at.team == gamestate.next_to_go) {
             board.add_red_team(at.pos.y, at.pos.x);
           } else {
             board.add_blue_team(at.pos.y, at.pos.x);

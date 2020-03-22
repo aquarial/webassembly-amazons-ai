@@ -15,8 +15,7 @@ extern {
 
 #[wasm_bindgen]
 pub struct RequestedBoard {
-  pub width:   f64,
-  pub height:  f64,
+  pub size:   f64,
   blocks:  Vec<(f64, f64)>,
   red_team: Vec<(f64, f64)>,
   blue_team: Vec<(f64, f64)>,
@@ -30,8 +29,7 @@ impl RequestedBoard {
 
   pub fn new() -> RequestedBoard {
     RequestedBoard {
-      width: 0.0,
-      height: 0.0,
+      size: 0.0,
       red_team: Vec::new(),
       blue_team: Vec::new(),
       blocks: Vec::new(),
@@ -41,27 +39,24 @@ impl RequestedBoard {
 
   pub fn is_valid(&self) -> bool {
     // [1, width]  [1, height]
-    if !is_int_in_range(self.width, (1.0, 10.0)) {
-      return false;
-    }
-    if !is_int_in_range(self.height, (1.0, 10.0)) {
+    if !is_int_in_range(self.size, (1.0, 10.0)) {
       return false;
     }
 
     for &(y,x) in &self.red_team {
-      if !is_int_in_range(y, (1.0, self.height)) || !is_int_in_range(x, (1.0, self.width)) {
+      if !is_int_in_range(y, (1.0, self.size)) || !is_int_in_range(x, (1.0, self.size)) {
         return false;
       }
     }
 
     for &(y,x) in &self.blue_team {
-      if !is_int_in_range(y, (1.0, self.height)) || !is_int_in_range(x, (1.0, self.width)) {
+      if !is_int_in_range(y, (1.0, self.size)) || !is_int_in_range(x, (1.0, self.size)) {
         return false;
       }
     }
 
     for &(y,x) in &self.blocks {
-      if !is_int_in_range(y, (1.0, self.height)) || !is_int_in_range(x, (1.0, self.width)) {
+      if !is_int_in_range(y, (1.0, self.size)) || !is_int_in_range(x, (1.0, self.size)) {
         return false;
       }
     }
