@@ -17,14 +17,46 @@ export class DrawState {
   }
 
 
+  /**
+   * @param {CanvasRenderingContext2D} c2d
+   * @param {number} tilesize
+   * @param {number} y
+   * @param {number} x
+   * @param {String} style
+   */
+  drawOneShape(c2d, tilesize, y, x, style) {
+    switch (style) {
+      case "circle":
+        c2d.beginPath();
+        c2d.ellipse((x - 1 + 0.5) * tilesize, (y - 1 + 0.5) * tilesize,
+          (tilesize) * 0.3, (tilesize) * 0.3, 0, 0, 360);
+        c2d.fill();
+        break;
+      case "circle outline":
+        c2d.beginPath();
+        c2d.ellipse((x - 1 + 0.5) * tilesize, (y - 1 + 0.5) * tilesize,
+          (tilesize * 1.1) * 0.3, (tilesize * 1.1) * 0.3, 0, 0, 360);
+        c2d.fill();
+        break;
+      case "block":
+        c2d.fillRect((x - 1 + 0.2) * tilesize, (y - 1 + 0.2) * tilesize, tilesize * 0.6, tilesize * 0.6)
+        break;
+    }
+  }
+
+  /**
+   * @param {string} team_name
+   */
   team_color(team_name, faded=false) {
+    if (team_name == "deselected") {
+      return "#30303055"
+    }
     if (team_name == "block") {
       if (faded) {
         return '#30303066'
       } else {
         return '#303030'
       }
-
     }
     if (team_name == "red") {
       if (faded) {
@@ -41,6 +73,7 @@ export class DrawState {
         return "#0000ff"
       }
     }
+    throw new Error("Unkown team: " + team_name)
   }
 
   /**
@@ -61,99 +94,69 @@ export class DrawState {
         if (this.piece == null) { // selecting a piece
 
           if (at instanceof Player) {
-            c2d.beginPath();
             c2d.fillStyle = "white"
-            c2d.ellipse((x - 1 + 0.5) * tilesize, (y - 1 + 0.5) * tilesize,
-              (tilesize * 1.1) * 0.3, (tilesize * 1.1) * 0.3, 0, 0, 360);
-            c2d.fill();
+            this.drawOneShape(c2d, tilesize, y, x, "circle outline")
             c2d.fillStyle = this.team_color(at.team)
-            c2d.beginPath();
-            c2d.ellipse((x - 1 + 0.5) * tilesize, (y - 1 + 0.5) * tilesize,
-              tilesize * 0.3, tilesize * 0.3, 0, 0, 360);
-            c2d.fill();
+            this.drawOneShape(c2d, tilesize, y, x, "circle")
           } else if (at != undefined) {
             c2d.fillStyle = this.team_color("block")
-            c2d.fillRect((x - 1 + 0.2) * tilesize, (y - 1 + 0.2) * tilesize, tilesize * 0.6, tilesize * 0.6)
+            this.drawOneShape(c2d, tilesize, y, x, "block")
           }
 
         } else if (this.move == null) { // selecting a move
 
           if (at === this.piece) {
-            c2d.beginPath();
-            c2d.fillStyle = "gray"
-            c2d.ellipse((x - 1 + 0.5) * tilesize, (y - 1 + 0.5) * tilesize,
-              (tilesize ) * 0.3, (tilesize) * 0.3, 0, 0, 360);
-            c2d.fill();
+            c2d.fillStyle = this.team_color("deselected")
+            this.drawOneShape(c2d, tilesize, y, x, "circle")
           }
 
           if (at == undefined && this.mouse_pos.y == y && this.mouse_pos.x == x) {
             if (gameboard.openLineTo(this.piece.pos, this.mouse_pos)) {
               c2d.fillStyle = this.team_color(this.piece.team, true)
-              c2d.beginPath();
-              c2d.ellipse((x - 1 + 0.5) * tilesize, (y - 1 + 0.5) * tilesize,
-                tilesize * 0.3, tilesize * 0.3, 0, 0, 360);
-              c2d.fill();
+              this.drawOneShape(c2d, tilesize, y, x, "circle")
             }
           }
 
           if (at instanceof Player) {
             if (at != this.piece) {
-              c2d.beginPath();
               c2d.fillStyle = "white"
-              c2d.ellipse((x - 1 + 0.5) * tilesize, (y - 1 + 0.5) * tilesize,
-                (tilesize * 1.1) * 0.3, (tilesize * 1.1) * 0.3, 0, 0, 360);
-              c2d.fill();
-              c2d.fillStyle = at.team;
-              c2d.beginPath();
-              c2d.ellipse((x - 1 + 0.5) * tilesize, (y - 1 + 0.5) * tilesize,
-                tilesize * 0.3, tilesize * 0.3, 0, 0, 360);
-              c2d.fill();
+              this.drawOneShape(c2d, tilesize, y, x, "circle outline")
+              c2d.fillStyle = this.team_color(at.team)
+              this.drawOneShape(c2d, tilesize, y, x, "circle")  
             }
           } else if (at != undefined) {
             c2d.fillStyle = this.team_color("block")
-            c2d.fillRect((x - 1 + 0.2) * tilesize, (y - 1 + 0.2) * tilesize, tilesize * 0.6, tilesize * 0.6)
+            this.drawOneShape(c2d, tilesize, y, x, "block")
           }
 
 
         } else { // selecting stone
 
           if (at === this.piece && !(y == this.mouse_pos.y && x == this.mouse_pos.x)) {
-            c2d.beginPath();
-            c2d.fillStyle = "gray"
-            c2d.ellipse((x - 1 + 0.5) * tilesize, (y - 1 + 0.5) * tilesize,
-              (tilesize ) * 0.3, (tilesize ) * 0.3, 0, 0, 360);
-            c2d.fill();
+            c2d.fillStyle = this.team_color("deselected")
+            this.drawOneShape(c2d, tilesize, y, x, "circle")
           }
 
           if (at instanceof Player) {
             if (at != this.piece) {
-              c2d.beginPath();
               c2d.fillStyle = "white"
-              c2d.ellipse((x - 1 + 0.5) * tilesize, (y - 1 + 0.5) * tilesize,
-                (tilesize * 1.1) * 0.3, (tilesize * 1.1) * 0.3, 0, 0, 360);
-              c2d.fill();
+              this.drawOneShape(c2d, tilesize, y, x, "circle outline")
               c2d.fillStyle = this.team_color(at.team)
-              c2d.beginPath();
-              c2d.ellipse((x - 1 + 0.5) * tilesize, (y - 1 + 0.5) * tilesize,
-                tilesize * 0.3, tilesize * 0.3, 0, 0, 360);
-              c2d.fill();
+              this.drawOneShape(c2d, tilesize, y, x, "circle")
             }
           } else if (at != undefined) {
             c2d.fillStyle = this.team_color("block")
-            c2d.fillRect((x - 1 + 0.2) * tilesize, (y - 1 + 0.2) * tilesize, tilesize * 0.6, tilesize * 0.6)
+            this.drawOneShape(c2d, tilesize, y, x, "block")
           } else if (y == this.move.y && x == this.move.x) {
             c2d.fillStyle = this.team_color(this.piece.team)
-            c2d.beginPath();
-            c2d.ellipse((x - 1 + 0.5) * tilesize, (y - 1 + 0.5) * tilesize,
-              tilesize * 0.3, tilesize * 0.3, 0, 0, 360);
-            c2d.fill();
-          }
+            this.drawOneShape(c2d, tilesize, y, x, "circle")
+        }
 
           gameboard.blocked.set(this.piece.pos.str(), undefined);
           if (y == this.mouse_pos.y && x == this.mouse_pos.x) {
             if (gameboard.openLineTo(this.move, this.mouse_pos)) {
               c2d.fillStyle = this.team_color("block", true)
-              c2d.fillRect((x - 1 + 0.2) * tilesize, (y - 1 + 0.2) * tilesize, tilesize * 0.6, tilesize * 0.6)
+              this.drawOneShape(c2d, tilesize, y, x, "block")
             }
           }
           gameboard.blocked.set(this.piece.pos.str(), this.piece);
