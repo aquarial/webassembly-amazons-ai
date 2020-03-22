@@ -1,4 +1,8 @@
 mod utils;
+mod solver;
+
+use solver::*;
+use solver::board::*;
 
 use wasm_bindgen::prelude::*;
 
@@ -68,13 +72,36 @@ impl RequestedBoard {
 
 #[wasm_bindgen]
 pub fn compute_ai_move(rb: &RequestedBoard) -> ReturnedMove {
-  let r = ReturnedMove {
+  let mut players = Vec::new();
+  for &(y,x) in &rb.blue_team {
+    players.push(Player{ team:Team::Blue, pos:Pos {row:  y as i8, col:  x as i8} });
+  }
+  for &(y,x) in &rb.red_team {
+    players.push(Player{ team:Team::Red, pos:Pos {row:  y as i8, col:  x as i8} });
+  }
+  let mut board = Board::new(rb.size as i8, players);
+  for &(y,x) in &rb.blocks {
+    board.wall_set(Pos {row:y as i8,col:x as i8}, true);
+  }
+
+  let mut amazon = Amazons::from_board(board);
+  if amazon.ai_move(Team::Red) {
+    let m = amazon.compute_last_move();
+    return ReturnedMove {
+      piece_y: m.player.pos.row as f64,
+      piece_x: m.player.pos.col as f64,
+      move_y: m.new_pos.row as f64,
+      move_x: m.new_pos.col as f64,
+      stone_y: m.new_shot.row as f64,
+      stone_x: m.new_shot.col as f64,
+    }
+  }
+
+  return ReturnedMove {
     piece_y: 0.0, piece_x: 0.0,
     move_y: 0.0, move_x: 0.0,
     stone_y: 0.0, stone_x: 0.0,
   };
-
-  r
 }
 
 #[wasm_bindgen]
