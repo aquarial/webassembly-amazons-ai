@@ -37,9 +37,45 @@ impl RequestedBoard {
       blocks: Vec::new(),
     }
   }
+
+
+  pub fn is_valid(&self) -> bool {
+    // [1, width]  [1, height]
+    if !is_int_in_range(self.width, (1.0, 10.0)) {
+      return false;
+    }
+    if !is_int_in_range(self.height, (1.0, 10.0)) {
+      return false;
+    }
+
+    for &(y,x) in &self.red_team {
+      if !is_int_in_range(y, (1.0, self.height)) || !is_int_in_range(x, (1.0, self.width)) {
+        return false;
+      }
+    }
+
+    for &(y,x) in &self.blue_team {
+      if !is_int_in_range(y, (1.0, self.height)) || !is_int_in_range(x, (1.0, self.width)) {
+        return false;
+      }
+    }
+
+    for &(y,x) in &self.blocks {
+      if !is_int_in_range(y, (1.0, self.height)) || !is_int_in_range(x, (1.0, self.width)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
 }
 
-#[wasm_bindgen]
-pub fn greet() {
-  alert("Hello, {{project-name}}!");
+fn is_int_in_range(val: f64, range:(f64, f64)) -> bool {
+  if !(range.0 <= val && val <= range.1) {
+    return false;
+  }
+  if val.floor() != val {
+    return false;
+  }
+  return true;
 }
