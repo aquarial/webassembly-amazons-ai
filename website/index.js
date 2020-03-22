@@ -43,6 +43,9 @@ let animations = [];
           c2d.ellipse((x - 1 + 0.5) * tilesize, (y - 1 + 0.5) * tilesize,
             tilesize * 0.3, tilesize * 0.3, 0, 0, 360);
           c2d.fill();
+        } else if (at != undefined) {
+          c2d.fillStyle = '#303030'
+          c2d.fillRect((x - 1 + 0.3) * tilesize, (y - 1 + 0.3) * tilesize, tilesize*0.4, tilesize*0.4)
         }
       }
     }
