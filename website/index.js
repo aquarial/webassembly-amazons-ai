@@ -66,16 +66,18 @@ let animations = [];
 
   let drawstate = new DrawState();
 
-  canvas.onmousemove = (function (event) {
-    let tilesize = canvas.width / gameboard.width;
 
-    let tx = Math.floor(event.offsetX / tilesize) + 1;
-    let ty = Math.floor(event.offsetY / tilesize) + 1;
-    if (drawstate.tilex != tx || drawstate.tiley != ty) {
-      drawstate.tilex = tx;
-      drawstate.tiley = ty;
-      drawstate.redrawboard = true;
-    }
+  // will be used for animations
+  canvas.onmousemove = (function (event) {
+    // let tilesize = canvas.width / gameboard.width;
+
+    // let tx = Math.floor(event.offsetX / tilesize) + 1;
+    // let ty = Math.floor(event.offsetY / tilesize) + 1;
+    // if (drawstate.tilex != tx || drawstate.tiley != ty) {
+    //   drawstate.tilex = tx;
+    //   drawstate.tiley = ty;
+    //   drawstate.redrawboard = true;
+    // }
   })
 
   canvas.onmousedown = function (event) {
