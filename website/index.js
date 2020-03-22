@@ -2,7 +2,7 @@
 /* jshint -W069, esversion:6 */
 
 import * as wasm from "amazons-ai-webassembly";
-import { GameBoard, Player, GameState } from "./game.js";
+import { GameBoard, Player, GameState, Pos } from "./game.js";
 import { DrawState } from "./drawstate.js";
 
 /** @type {((dt: number, totaltime: number) => void)[]} */
@@ -24,7 +24,7 @@ let animations = [];
         c2d.fillStyle = checker_colors[(x + y) % 2]
         c2d.fillRect((x - 1) * tilesize, (y - 1) * tilesize, tilesize, tilesize)
 
-        let at = gameboard.atPos(y, x)
+        let at = gameboard.atYX(y, x);
         if (at instanceof Player) {
           if (at == drawstate.piece) {
             c2d.beginPath();
@@ -53,10 +53,10 @@ let animations = [];
   let c2d = canvas.getContext("2d");
 
   let gameboard = new GameBoard(8, 8);
-  gameboard.addPlayer(new Player(3, 3, "red"));
-  gameboard.addPlayer(new Player(3, 6, "red"));
-  gameboard.addPlayer(new Player(6, 3, "blue"));
-  gameboard.addPlayer(new Player(6, 6, "blue"));
+  gameboard.addPlayer(new Player(new Pos(3, 3), "red"));
+  gameboard.addPlayer(new Player(new Pos(3, 6), "red"));
+  gameboard.addPlayer(new Player(new Pos(6, 3), "blue"));
+  gameboard.addPlayer(new Player(new Pos(6, 6), "blue"));
 
 
   let gamestate = new GameState();
@@ -80,8 +80,9 @@ let animations = [];
 
     let tx = Math.floor(event.offsetX / tilesize) + 1;
     let ty = Math.floor(event.offsetY / tilesize) + 1;
+    let tpos = new Pos(ty, tx);
 
-    let at = gameboard.atPos(ty, tx)
+    let at = gameboard.atPos(tpos);
     if (at instanceof Player) {
       drawstate.piece = null;
       if (at.team === gamestate.next_to_go) {
@@ -96,23 +97,23 @@ let animations = [];
         // make pieces flash
         console.log("No Piece selected!")
       } else if (drawstate.move == null) {
-        if (gameboard.openLineTo(drawstate.piece.y, drawstate.piece.x, ty, tx)) {
-          drawstate.move = [ty, tx];
+        if (gameboard.openLineTo(drawstate.piece, tpos)) {
+          drawstate.move = tpos;
         } else {
           console.log("Invalid move")
           drawstate.piece = null;
         }
       } else if (drawstate.stone == null) {
-        gameboard.blocked.set(drawstate.piece.pos(), undefined);
-        if (gameboard.openLineTo(drawstate.move[0], drawstate.move[1], ty, tx)) {
-          gameboard.blocked.set(drawstate.piece.pos(), drawstate.piece);
-          drawstate.stone = [ty, tx];
+        gameboard.blocked.set(drawstate.piece.pos.str(), undefined);
+        if (gameboard.openLineTo(drawstate.move, tpos)) {
+          gameboard.blocked.set(drawstate.piece.pos.str(), drawstate.piece);
+          drawstate.stone = tpos;
           console.log("Move from", drawstate.piece, drawstate.move, drawstate.stone);
           drawstate.piece = null;
           drawstate.move = null;
           drawstate.stone = null;
         } else {
-          gameboard.blocked.set(drawstate.piece.pos(), drawstate.piece);
+          gameboard.blocked.set(drawstate.piece.pos.str(), drawstate.piece);
           console.log("Invalid stone")
           drawstate.piece = null;
           drawstate.move = null;

@@ -12,7 +12,11 @@ export class DrawState {
 
         /** @type {Player} */
         this.piece = null
+
+        /** @type {Pos} */
         this.move = null
+        
+        /** @type {Pos} */
         this.stone = null
     }
 }

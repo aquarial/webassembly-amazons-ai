@@ -2,20 +2,29 @@
 // @ts-check
 
 
-export class Player {
+export class Pos {
     /**
-     * @param {number} x
-     * @param {number} y
-     * @param {string} team
-     */
-    constructor(y, x, team) {
+    * @param {number} x
+    * @param {number} y
+    */
+    constructor(y, x) {
         this.x = x
         this.y = y
-        this.team = team
     }
-
-    pos() {
+    
+    str() {
         return `${this.y} ${this.x}`
+    }
+}
+
+export class Player {
+    /**
+     * @param {Pos} pos
+     * @param {string} team
+     */
+    constructor(pos, team) {
+        this.pos = pos
+        this.team = team
     }
 }
 
@@ -34,14 +43,36 @@ export class GameBoard {
     }
 
     /**
-     * @param {number} y
-     * @param {number} x
+     * @param {Player|Pos} p
      */
-    atPos(y, x) {
+    atPos(p) {
+        if (p instanceof Player)
+            p = p.pos
+        return this.blocked.get(p.str())
+    }
+    /**
+     * @param {Number} y
+     * @param {Number} x
+     */
+    atYX(y, x) {
         return this.blocked.get(`${y} ${x}`)
     }
 
-    openLineTo(y0, x0, y1, x1) {
+    /**
+     * @param {Player|Pos} p0
+     * @param {Player|Pos} p1
+     */
+    openLineTo(p0, p1) {
+        if (p0 instanceof Player)
+            p0 = p0.pos
+        if (p1 instanceof Player)
+            p1 = p1.pos
+        //
+        let y0 = p0.y;
+        let x0 = p0.x;
+        let y1 = p1.y;
+        let x1 = p1.x;
+
         if (y0 == y1 && x0 == x1) {
             return false; // can't be same point
         }
@@ -52,7 +83,7 @@ export class GameBoard {
         let distance = Math.max(Math.abs(y1 - y0), Math.abs(x1 - x0));
 
         for (let dt = 1; dt <= distance; dt++) {
-            if (this.atPos(y0 + dt * Math.sign(y1 - y0), x0 + dt * Math.sign(x1 - x0))) {
+            if (this.atYX(y0 + dt * Math.sign(y1 - y0), x0 + dt * Math.sign(x1 - x0))) {
                 return false;
             }
         }
@@ -64,7 +95,7 @@ export class GameBoard {
      * @param {Player} player
      */
     addPlayer(player) {
-        this.blocked.set(player.pos(), player)
+        this.blocked.set(player.pos.str(), player)
     }
 }
 
