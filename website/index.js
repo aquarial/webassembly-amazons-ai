@@ -58,11 +58,11 @@ let animations = [];
       if (r.piece_y > 0 && r.piece_x > 0 &&
         r.move_y > 0 && r.move_x > 0 &&
         r.stone_y > 0 && r.stone_x > 0) {
-        let p0 = new Pos(r.piece_y, r.piece_x)
+        let p0 = gameboard.atPos(new Pos(r.piece_y, r.piece_x))
         let p1 = new Pos(r.move_y, r.move_x)
         let p2 = new Pos(r.stone_y, r.stone_x)
-        gamestate.addMove(gameboard.atPos(p0), p1, p2)
-        gameboard.makePlayerMove(gameboard.atPos(p0), p1, p2)
+        gamestate.addMove(p0, p1, p2)
+        gameboard.makePlayerMove(p0, p1, p2)
         drawstate.piece = null
         drawstate.move = null;
       }
