@@ -36,23 +36,25 @@ let animations = [];
   let makeai = (document.getElementById("makeai"));
   makeai.onmousedown = function (event) {
     let board = wasm.RequestedBoard.new();
-    board.set_height(gameboard.height);
-    board.set_width(gameboard.width);
+    board.width = gameboard.width;
+    board.height = gameboard.height;
     for (let y = 1; y <= gameboard.height; y++) {
       for (let x = 1; x <= gameboard.width; x++) {
         let at = gameboard.atYX(y, x);
         if (at instanceof Player) {
-          board.add_player(y, x)
+          if (at.team == "red") {
+            board.add_red_team(at.pos.y, at.pos.x);
+          } else {
+            board.add_blue_team(at.pos.y, at.pos.x);
+          }
         } else if (at != undefined) {
           board.add_block(y, x)
         }
       }
     }
-    board.board_greet();
+
+
     board.free();
-    // wasm.greet();
-    // gamestate.addMove(drawstate.piece, drawstate.move, tpos)
-    // gameboard.makePlayerMove(drawstate.piece, drawstate.move, tpos)
   }
 
 
