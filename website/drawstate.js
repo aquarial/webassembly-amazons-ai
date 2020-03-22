@@ -7,8 +7,7 @@ import { Player, Pos, GameBoard } from "./game";
 
 export class DrawState {
   constructor() {
-    this.tilex = -1;
-    this.tiley = -1;
+    this.tilepos = new Pos(-1,-1);
 
     /** @type {Player} */
     this.piece = null
