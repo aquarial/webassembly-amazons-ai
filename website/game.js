@@ -11,7 +11,11 @@ export class Pos {
         this.x = x
         this.y = y
     }
-    
+
+    copy() {
+        return new Pos(this.y, this.x);
+    }
+
     str() {
         return `${this.y} ${this.x}`
     }
@@ -112,8 +116,44 @@ export class GameBoard {
     }
 }
 
+class Move {
+    constructor(player, move, stone, ai) {
+        this.player = player.copy();
+        this.move = move.copy();
+        this.stone = stone.copy();
+        this.ai = ai;
+    }
+}
 
 export class GameState {
+
+    constructor() {
+        /** @type {Move[]} */
+        this.history = []
+        this.next_to_go = "red"
+    }
+
+    undoMove(gameboard) {
+        let v = this.history.pop()
+        console.log("Popped", v)
+        if (v != undefined) {
+            if (this.next_to_go == "red") {
+                this.next_to_go = 'blue'
+            } else {
+                this.next_to_go = "red"
+            }
+            gameboard.blocked.set(v.stone.str(), undefined)
+
+            let player = gameboard.atPos(v.move);
+            gameboard.blocked.set(v.player.str(), player)
+            gameboard.blocked.set(v.move.str(), undefined)
+            player.pos.y = v.player.y
+            player.pos.x = v.player.x
+            if (v.ai) {
+                this.undoMove(gameboard);
+            }
+        }
+    }
 
     /**
      * @param {Player} player
@@ -121,13 +161,11 @@ export class GameState {
      * @param {Pos} stone
      */
     addMove(player, move, stone) {
+        this.history.push(new Move(player.pos, move, stone, false))
         if (this.next_to_go == "red") {
             this.next_to_go = 'blue'
         } else {
             this.next_to_go = "red"
         }
-    }
-    constructor() {
-        this.next_to_go = "red"
     }
 }
