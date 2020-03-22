@@ -66,6 +66,12 @@ let animations = [];
 
   let drawstate = new DrawState();
 
+  /** @type {HTMLButtonElement} */
+  let undo = (document.getElementById("undo"));
+  undo.onmousedown = function(event) {
+    gamestate.undoMove(gameboard);
+    drawstate.redrawboard = true;
+  }
 
   // will be used for animations
   canvas.onmousemove = (function (event) {
@@ -80,6 +86,7 @@ let animations = [];
     // }
   })
 
+  // click handler
   canvas.onmousedown = function (event) {
     let tilesize = canvas.width / gameboard.width;
 
