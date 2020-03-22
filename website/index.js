@@ -53,6 +53,13 @@ let animations = [];
       }
     }
 
+    if (board.is_valid()) {
+      let r = wasm.compute_ai_move(board)
+      console.log(r.piece_y, r.piece_x, r.move_y, r.move_x, r.stone_y, r.stone_x)
+      r.free();
+    } else {
+      alert("Error: invalid board??")
+    }
 
     board.free();
   }

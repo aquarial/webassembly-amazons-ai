@@ -10,7 +10,7 @@ static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
 #[wasm_bindgen]
 extern {
-  fn alert(s: &str);
+  // fn alert(s: &str);
 }
 
 #[wasm_bindgen]
@@ -68,6 +68,28 @@ impl RequestedBoard {
 
     return true;
   }
+}
+
+
+#[wasm_bindgen]
+pub fn compute_ai_move(rb: &RequestedBoard) -> ReturnedMove {
+  let r = ReturnedMove {
+    piece_y: 0.0, piece_x: 0.0,
+    move_y: 0.0, move_x: 0.0,
+    stone_y: 0.0, stone_x: 0.0,
+  };
+
+  r
+}
+
+#[wasm_bindgen]
+pub struct ReturnedMove {
+  pub piece_y: f64,
+  pub piece_x: f64,
+  pub move_y: f64,
+  pub move_x: f64,
+  pub stone_y: f64,
+  pub stone_x: f64,
 }
 
 fn is_int_in_range(val: f64, range:(f64, f64)) -> bool {
