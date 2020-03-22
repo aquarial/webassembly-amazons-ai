@@ -10,47 +10,6 @@ let animations = [];
 
 
 {
-  /**
-   * @param {CanvasRenderingContext2D} c2d
-   * @param {DrawState} drawstate
-   * @param {GameBoard} gameboard
-   */
-  function drawTiles(c2d, drawstate, gameboard) {
-    let tilesize = canvas.width / gameboard.width;
-    let checker_colors = ["#eae8ea", "#c1c1c1"]
-
-    for (let y = 1; y <= gameboard.height; y++) {
-      for (let x = 1; x <= gameboard.width; x++) {
-        c2d.fillStyle = checker_colors[(x + y) % 2]
-        c2d.fillRect((x - 1) * tilesize, (y - 1) * tilesize, tilesize, tilesize)
-
-        let at = gameboard.atYX(y, x);
-        if (at instanceof Player) {
-          if (at == drawstate.piece) {
-            c2d.beginPath();
-            c2d.fillStyle = "gray"
-            c2d.ellipse((x - 1 + 0.5) * tilesize, (y - 1 + 0.5) * tilesize,
-              (tilesize * 1.4) * 0.3, (tilesize * 1.4) * 0.3, 0, 0, 360);
-            c2d.fill();
-          }
-          c2d.beginPath();
-          c2d.fillStyle = "white"
-          c2d.ellipse((x - 1 + 0.5) * tilesize, (y - 1 + 0.5) * tilesize,
-            (tilesize * 1.1) * 0.3, (tilesize * 1.1) * 0.3, 0, 0, 360);
-          c2d.fill();
-          c2d.fillStyle = at.team
-          c2d.beginPath();
-          c2d.ellipse((x - 1 + 0.5) * tilesize, (y - 1 + 0.5) * tilesize,
-            tilesize * 0.3, tilesize * 0.3, 0, 0, 360);
-          c2d.fill();
-        } else if (at != undefined) {
-          c2d.fillStyle = '#303030'
-          c2d.fillRect((x - 1 + 0.3) * tilesize, (y - 1 + 0.3) * tilesize, tilesize*0.4, tilesize*0.4)
-        }
-      }
-    }
-  }
-
   /** @type {HTMLCanvasElement} */
   let canvas = (document.getElementById("thecanvas"));
   let c2d = canvas.getContext("2d");
@@ -70,7 +29,6 @@ let animations = [];
   let undo = (document.getElementById("undo"));
   undo.onmousedown = function(event) {
     gamestate.undoMove(gameboard);
-    drawstate.redrawboard = true;
   }
   /** @type {HTMLButtonElement} */
   let makeai = (document.getElementById("makeai"));
@@ -93,7 +51,6 @@ let animations = [];
     // wasm.greet();
     // gamestate.addMove(drawstate.piece, drawstate.move, tpos)
     // gameboard.makePlayerMove(drawstate.piece, drawstate.move, tpos)
-    drawstate.redrawboard = true;
   }
 
 
@@ -169,13 +126,9 @@ let animations = [];
     }
 
 
-    drawstate.redrawboard = true;
   }
   animations.push((dt, totaltime) => {
-    if (drawstate.redrawboard) {
-      drawstate.redrawboard = false;
-      drawTiles(c2d, drawstate, gameboard);
-    }
+    drawstate.drawTiles(c2d, gameboard, canvas.width / gameboard.width)
   })
 }
 
