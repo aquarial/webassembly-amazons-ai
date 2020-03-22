@@ -59,8 +59,8 @@ let animations = [];
   canvas.onmouseleave = function (event) {
     drawstate.piece = null
     drawstate.move = null
-    drawstate.tilepos.y = -1;
-    drawstate.tilepos.x = -1;
+    drawstate.mouse_pos.y = -1;
+    drawstate.mouse_pos.x = -1;
   }
 
   // will be used for animations
@@ -69,8 +69,8 @@ let animations = [];
 
     let tx = Math.floor(event.offsetX / tilesize) + 1;
     let ty = Math.floor(event.offsetY / tilesize) + 1;
-    drawstate.tilepos.x = tx;
-    drawstate.tilepos.y = ty;
+    drawstate.mouse_pos.x = tx;
+    drawstate.mouse_pos.y = ty;
   })
 
   // click handler
