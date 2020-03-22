@@ -72,6 +72,15 @@ let animations = [];
     gamestate.undoMove(gameboard);
     drawstate.redrawboard = true;
   }
+  /** @type {HTMLButtonElement} */
+  let makeai = (document.getElementById("makeai"));
+  makeai.onmousedown = function(event) {
+    wasm.greet();
+    // gamestate.addMove(drawstate.piece, drawstate.move, tpos)
+    // gameboard.makePlayerMove(drawstate.piece, drawstate.move, tpos)
+    drawstate.redrawboard = true;
+  }
+
 
   // will be used for animations
   canvas.onmousemove = (function (event) {
