@@ -42,7 +42,7 @@ export class GameBoard {
     constructor(width, height) {
         this.width = width
         this.height = height
-        /** @type {Map<string,Any|Player>} */
+        /** @type {Map<string,any|Player>} */
         this.blocked = new Map()
     }
 
