@@ -1,7 +1,9 @@
-import { Player } from "./game";
-
 /*jshint esversion: 6 */
 // @ts-check
+
+import { Player, Pos, GameBoard } from "./game";
+
+
 
 export class DrawState {
     constructor() {
@@ -17,9 +19,10 @@ export class DrawState {
 
 
     /**
- * @param {CanvasRenderingContext2D} c2d
- * @param {GameBoard} gameboard
- */
+   * @param {CanvasRenderingContext2D} c2d
+   * @param {GameBoard} gameboard
+   * @param {number} tilesize
+   */
     drawTiles(c2d, gameboard, tilesize) {
         let checker_colors = ["#eae8ea", "#c1c1c1"]
 
@@ -30,7 +33,7 @@ export class DrawState {
 
                 let at = gameboard.atYX(y, x);
                 if (at instanceof Player) {
-                    if (at == drawstate.piece) {
+                    if (at == this.piece) {
                         c2d.beginPath();
                         c2d.fillStyle = "gray"
                         c2d.ellipse((x - 1 + 0.5) * tilesize, (y - 1 + 0.5) * tilesize,
