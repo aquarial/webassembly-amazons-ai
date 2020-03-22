@@ -15,8 +15,5 @@ export class DrawState {
 
         /** @type {Pos} */
         this.move = null
-        
-        /** @type {Pos} */
-        this.stone = null
     }
 }

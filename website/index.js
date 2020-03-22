@@ -99,32 +99,31 @@ let animations = [];
           drawstate.piece = at;
         }
         drawstate.move = null;
-        drawstate.stone = null;
-
       }
+    } else if (at != null) {
+      drawstate.piece = null;
+      drawstate.move = null;
     }
 
     if (at == undefined) {
-      if (drawstate.piece == null) {
+      if (drawstate.piece == null) { // select piece
         // make pieces flash
         console.log("No Piece selected!")
-      } else if (drawstate.move == null) {
+      } else if (drawstate.move == null) { // move pieces
         if (gameboard.openLineTo(drawstate.piece, tpos)) {
           drawstate.move = tpos;
         } else {
           console.log("Invalid move")
           drawstate.piece = null;
         }
-      } else if (drawstate.stone == null) {
+      } else { // place stone
         gameboard.blocked.set(drawstate.piece.pos.str(), undefined);
         if (gameboard.openLineTo(drawstate.move, tpos)) {
           gameboard.blocked.set(drawstate.piece.pos.str(), drawstate.piece);
-          drawstate.stone = tpos;
-          gameboard.makePlayerMove(drawstate.piece, drawstate.move, drawstate.stone)
-          gamestate.addMove(drawstate.piece, drawstate.move, drawstate.stone)
+          gameboard.makePlayerMove(drawstate.piece, drawstate.move, tpos)
+          gamestate.addMove(drawstate.piece, drawstate.move, tpos)
           drawstate.piece = null;
           drawstate.move = null;
-          drawstate.stone = null;
         } else {
           gameboard.blocked.set(drawstate.piece.pos.str(), drawstate.piece);
           console.log("Invalid stone")
