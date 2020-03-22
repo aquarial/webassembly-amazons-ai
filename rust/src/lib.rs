@@ -15,6 +15,9 @@ static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 #[wasm_bindgen]
 extern {
   // fn alert(s: &str);
+
+  #[wasm_bindgen(js_namespace = console)]
+  fn log(s: &str);
 }
 
 #[wasm_bindgen]
@@ -87,6 +90,8 @@ pub fn compute_ai_move(rb: &RequestedBoard) -> ReturnedMove {
   let mut amazon = Amazons::from_board(board);
   if amazon.ai_move(Team::Red) {
     let m = amazon.compute_last_move();
+    log(&amazon.nth_last_board(1).pprint());
+    log(&amazon.nth_last_board(0).pprint());
     return ReturnedMove {
       piece_y: m.player.pos.row as f64,
       piece_x: m.player.pos.col as f64,
