@@ -90,8 +90,10 @@ let animations = [];
       if (at === drawstate.piece) {
         if (drawstate.move != null) {
           // placing a stone on the location of the moving piece
-          gameboard.makePlayerMove(drawstate.piece, drawstate.move, tpos)
+          console.log("How is ", drawstate.piece.pos, at.pos, "already 44?")
+          console.log("add move ", drawstate.piece, drawstate.move, tpos)
           gamestate.addMove(drawstate.piece, drawstate.move, tpos)
+          gameboard.makePlayerMove(drawstate.piece, drawstate.move, tpos)
           drawstate.piece = null
           drawstate.move = null;
         } else {
@@ -125,8 +127,8 @@ let animations = [];
         gameboard.blocked.set(drawstate.piece.pos.str(), undefined);
         if (gameboard.openLineTo(drawstate.move, tpos)) {
           gameboard.blocked.set(drawstate.piece.pos.str(), drawstate.piece);
-          gameboard.makePlayerMove(drawstate.piece, drawstate.move, tpos)
           gamestate.addMove(drawstate.piece, drawstate.move, tpos)
+          gameboard.makePlayerMove(drawstate.piece, drawstate.move, tpos)
           drawstate.piece = null;
           drawstate.move = null;
         } else {
