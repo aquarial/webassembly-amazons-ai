@@ -56,6 +56,13 @@ let animations = [];
   }
 
 
+  canvas.onmouseleave = function (event) {
+    drawstate.piece = null
+    drawstate.move = null
+    drawstate.tilepos.y = -1;
+    drawstate.tilepos.x = -1;
+  }
+
   // will be used for animations
   canvas.onmousemove = (function (event) {
     let tilesize = canvas.width / gameboard.width;
