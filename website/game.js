@@ -135,7 +135,7 @@ export class GameState {
 
     undoMove(gameboard) {
         let v = this.history.pop()
-        console.log("Popped", v)
+
         if (v != undefined) {
             if (this.next_to_go == "red") {
                 this.next_to_go = 'blue'

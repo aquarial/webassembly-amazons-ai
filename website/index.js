@@ -99,8 +99,6 @@ let animations = [];
       if (at === drawstate.piece) {
         if (drawstate.move != null) {
           // placing a stone on the location of the moving piece
-          console.log("How is ", drawstate.piece.pos, at.pos, "already 44?")
-          console.log("add move ", drawstate.piece, drawstate.move, tpos)
           gamestate.addMove(drawstate.piece, drawstate.move, tpos)
           gameboard.makePlayerMove(drawstate.piece, drawstate.move, tpos)
           drawstate.piece = null
@@ -124,12 +122,10 @@ let animations = [];
     if (at == undefined) {
       if (drawstate.piece == null) { // select piece
         // make pieces flash
-        console.log("No Piece selected!")
       } else if (drawstate.move == null) { // move pieces
         if (gameboard.openLineTo(drawstate.piece, tpos)) {
           drawstate.move = tpos;
         } else {
-          console.log("Invalid move")
           drawstate.piece = null;
         }
       } else { // place stone
@@ -142,7 +138,6 @@ let animations = [];
           drawstate.move = null;
         } else {
           gameboard.blocked.set(drawstate.piece.pos.str(), drawstate.piece);
-          console.log("Invalid stone")
           drawstate.piece = null;
           drawstate.move = null;
         }
