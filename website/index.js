@@ -33,6 +33,18 @@ let animations = [];
     drawstate.move = null;
   }
   /** @type {HTMLButtonElement} */
+  let newgame = (document.getElementById("newgame"));
+  newgame.onmousedown = function (event) {
+    // TODO: allow undoing 'newgame'
+    gamestate = new GameState();
+    drawstate = new DrawState();  
+    gameboard = new GameBoard(8, 8);
+    gameboard.addPlayer(new Player(new Pos(3, 3), "red"));
+    gameboard.addPlayer(new Player(new Pos(3, 6), "red"));
+    gameboard.addPlayer(new Player(new Pos(6, 3), "blue"));
+    gameboard.addPlayer(new Player(new Pos(6, 6), "blue"));  
+  }
+  /** @type {HTMLButtonElement} */
   let makeai = (document.getElementById("makeai"));
   makeai.onmousedown = function (event) {
     let board = wasm.RequestedBoard.new();
