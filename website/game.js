@@ -117,6 +117,12 @@ export class GameBoard {
 }
 
 class Move {
+  /**
+   * @param {Pos} player
+   * @param {Pos} move
+   * @param {Pos} stone
+   * @param {boolean} ai
+   */
   constructor(player, move, stone, ai) {
     this.player = player.copy();
     this.move = move.copy();
@@ -133,6 +139,9 @@ export class GameState {
     this.next_to_go = "red"
   }
 
+  /**
+   * @param {GameBoard} gameboard
+   */
   undoMove(gameboard, ai=true) {
     let v = this.history.pop()
 
