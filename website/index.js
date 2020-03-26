@@ -52,14 +52,36 @@ let animations = [];
     newgame.disabled = true
     console.log(makeai.disabled);
 
-    let w = new Worker("run-ai.js");
+    let w = new Worker("run-ai.js", {type: "module"});
     w.onmessage = function (ev) {
       console.log("index.js received", ev);
       makeai.disabled = false
       undo.disabled = false
       newgame.disabled = false
     }
-    w.postMessage("test")
+
+    let board = wasm.RequestedBoard.new();
+    board.size = gameboard.width;
+    for (let y = 1; y <= gameboard.height; y++) {
+      for (let x = 1; x <= gameboard.width; x++) {
+        let at = gameboard.atYX(y, x);
+        if (at instanceof Player) {
+          if (at.team == gamestate.next_to_go) {
+            board.add_red_team(at.pos.y, at.pos.x);
+          } else {
+            board.add_blue_team(at.pos.y, at.pos.x);
+          }
+        } else if (at != undefined) {
+          board.add_block(y, x)
+        }
+      }
+    }
+    w.postMessage({'wasm': board})
+
+    console.log("HAVEE E " , wasm)
+    console.log("HAVEE:", board.is_valid);
+
+    board.free()
   }
 
 
