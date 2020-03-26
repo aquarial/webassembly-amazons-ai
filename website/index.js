@@ -14,6 +14,10 @@ let animations = [];
   let canvas = (document.getElementById("thecanvas"));
   let c2d = canvas.getContext("2d");
 
+  /** @type {HTMLCanvasElement} */
+  let next2go = (document.getElementById("next2go"));
+  let next2go_2d = next2go.getContext("2d");
+
   let gameboard = new GameBoard(8, 8);
   gameboard.addPlayer(new Player(new Pos(3, 3), "red"));
   gameboard.addPlayer(new Player(new Pos(3, 6), "red"));
@@ -165,6 +169,8 @@ let animations = [];
 
   }
   animations.push((dt, totaltime) => {
+    next2go_2d.fillStyle = gamestate.next_to_go
+    next2go_2d.fillRect(0, 0, next2go.width, next2go.height)
     drawstate.drawTiles(c2d, gameboard, canvas.width / gameboard.width)
   })
 }
