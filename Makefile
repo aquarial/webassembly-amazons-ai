@@ -19,8 +19,8 @@ run-local:
 .PHONY: deploy
 deploy:
 	nix-shell --command "           \
-	wasm-pack build rust/        && \
-	cd website                   && \
-	npx webpack"
+	    wasm-pack build rust/        && \
+	    cd website                   && \
+	    npx webpack"
 	echo "Check ./wasm-app/dist/"
 
