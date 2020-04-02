@@ -151,11 +151,11 @@ fn max_move(board: &Board, team: Team, strategy: EvalStrategy, depth: i32, cache
     let best = board.successors(team)
       .map(|b| {
         local_board.apply_move(&b);
-        let s = evaluate_by_queen_bfs_distance(&local_board, team, cache);
+        let s = evaluate_by_queen_bfs_distance(&local_board, team.other(), cache);
         local_board.un_apply_move(&b);
         (s, b)
       })
-      .max_by_key(|it| it.0);
+      .min_by_key(|it| it.0);
     if let Some((score, board)) = best {
       return (Some(board), score);
     } else {
