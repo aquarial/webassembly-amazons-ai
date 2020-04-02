@@ -123,11 +123,6 @@ impl Amazons {
     }
   }
 
-  /// Evaluate the `ix`th last board with an AI heuristic.
-  pub fn evaluate(&mut self, ix: usize, team: Team, strategy: EvalStrategy) -> i64 {
-    return self.nth_last_board(ix).evaluate(team, strategy, &mut self.cache);
-  }
-
   /// Look back in history for a board state.
   ///
   /// If the index is too far back in time, this
@@ -149,7 +144,7 @@ impl Amazons {
 fn max_move(board: &Board, team: Team, strategy: EvalStrategy, depth: i32, cache: &mut DistState) -> (Option<Board>, i64) {
   if depth <= 1 {
     let best = board.successors(team)
-      .map(|b| (b.evaluate(team, strategy, cache), b))
+      .map(|b| (evaluate_by_queen_bfs_distance(&b, team, cache), b))
       .max_by_key(|it| it.0);
     if let Some((score, board)) = best {
       return (Some(board), score);
@@ -161,7 +156,7 @@ fn max_move(board: &Board, team: Team, strategy: EvalStrategy, depth: i32, cache
   let mut best: Option<Board> = None;
   let mut score: i64 = i64::min_value() + 1;
 
-  for (_, b) in top_n(board.successors(team).map(|i| (i.evaluate(team, strategy, cache), i))) {
+  for (_, b) in top_n(board.successors(team).map(|i| (evaluate_by_queen_bfs_distance(&i, team, cache), i))) {
     //if score != i64::min_value() && b.evaluate(team, dist_state) < starting_val - 1 {
     //    // can't do this in the end-game!
     //    //continue;

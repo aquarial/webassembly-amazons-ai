@@ -290,61 +290,56 @@ impl Board {
         })
       })
   }
+}
 
-  pub fn evaluate(&self, team: Team, strategy: EvalStrategy, dist_state: &mut DistState) -> i64 {
-    match strategy {
-      EvalStrategy::QueenDistance => {
-        self.bfs_eval(team, dist_state)
-      },
+
+pub fn evaluate_by_queen_bfs_distance(board: &Board, team: Team, dist_state: &mut DistState) -> i64 {
+  bfs(board, team, &mut dist_state.next, &mut dist_state.left);
+  bfs(board, team.other(), &mut dist_state.next, &mut dist_state.right);
+
+  let mut score = 0;
+  let mut is_end = true;
+  for (&a,&b) in dist_state.left.iter().zip(dist_state.right.iter()) {
+    if a < b {
+      score = score + 1;
+    }
+    if a > b {
+      score = score - 1;
+    }
+    if a != u8::max_value() && b != u8::max_value() {
+      is_end = false;
     }
   }
-  fn bfs_eval(&self, team: Team, dist_state: &mut DistState) -> i64 {
-    self.bfs(team, &mut dist_state.next, &mut dist_state.left);
-    self.bfs(team.other(), &mut dist_state.next, &mut dist_state.right);
-
-    let mut score = 0;
-    let mut is_end = true;
-    for (&a,&b) in dist_state.left.iter().zip(dist_state.right.iter()) {
-      if a < b {
-        score = score + 1;
-      }
-      if a > b {
-        score = score - 1;
-      }
-      if a != u8::max_value() && b != u8::max_value() {
-        is_end = false;
-      }
+  if is_end {
+    if score >= 0 {
+      return i64::max_value();
     }
-    if is_end {
-      if score >= 0 {
-        return i64::max_value();
-      }
-      return i64::min_value() + 1;
-    }
-    return score;
+    return i64::min_value() + 1;
   }
+  return score;
+}
 
-  fn bfs(&self, team: Team, next: &mut VecDeque<(Pos, u8)>, distances: &mut Vec<u8>) {
-    for i in 0..distances.len() {
-      distances[i] = u8::max_value();
-    }
-    next.clear();
-    self.players()
-      .filter(|p| p.team == team)
-      .map(|p| (p.pos, 0))
-      .for_each(|it| next.push_back(it));
+fn bfs(board: &Board, team: Team, next: &mut VecDeque<(Pos, u8)>, distances: &mut Vec<u8>) {
+  for i in 0..distances.len() {
+    distances[i] = u8::max_value();
+  }
+  next.clear();
+  board.players()
+    .filter(|p| p.team == team)
+    .map(|p| (p.pos, 0))
+    .for_each(|it| next.push_back(it));
 
-    while let Some((pos,depth)) = next.pop_front() {
-      for neigh in queen_range(self, pos, pos) {
-        let place = &mut distances[neigh.to_linear(self.board_size)];
-        if depth + 1 < *place {
-          *place = depth + 1;
-          next.push_back((neigh, depth+1));
-        }
+  while let Some((pos,depth)) = next.pop_front() {
+    for neigh in queen_range(board, pos, pos) {
+      let place = &mut distances[neigh.to_linear(board.board_size)];
+      if depth + 1 < *place {
+        *place = depth + 1;
+        next.push_back((neigh, depth+1));
       }
     }
   }
 }
+
 
 const QUEEN_DIRS: [(i8,i8); 8] = [(-1,-1),(-1,0),(-1,1),
                                   ( 0,-1)       ,( 0,1),
