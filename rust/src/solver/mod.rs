@@ -108,10 +108,6 @@ impl Amazons {
     return Err(format!("You don't have a piece at the position"));
   }
 
-  pub fn compute_last_move(&self) -> Move {
-    return self.nth_last_board(1).difference(&self.nth_last_board(0));
-  }
-
   /// Compute and make a move for an AI team.
   ///
   /// Return false if the AI gives up.

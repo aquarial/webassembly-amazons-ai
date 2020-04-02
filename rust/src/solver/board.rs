@@ -80,14 +80,6 @@ pub struct Player {
 
 /// Player and what they do.
 #[derive(Clone, Debug)]
-pub struct Move {
-  pub player: Player,
-  pub new_pos: Pos,
-  pub new_shot: Pos,
-}
-
-/// Player and what they do.
-#[derive(Clone, Debug)]
 pub struct CompactMove {
   pub player_ix: usize,
   pub old_pos: Pos,
@@ -176,34 +168,6 @@ impl Board {
       players_array: pa,
     };
   }
-
-  pub fn difference(&self, other: &Board) -> Move {
-    let mut ix = 0;
-    for i in 0..MAX_NUM_PLAYERS {
-      if self.players_array[i] != other.players_array[i] {
-        ix = i;
-      }
-    }
-    let mut shotpos = Pos {row: 0, col:0};
-    for r in 0..self.board_size {
-      for c in 0..self.board_size {
-        if ((self.players_array[ix].pos.row == r &&
-            self.players_array[ix].pos.col == c) || !self.wall_at(Pos{row:r,col:c})) &&
-          other.wall_at(Pos{row:r,col:c}) &&
-          !(other.players_array[ix].pos.row == r &&
-          other.players_array[ix].pos.col == c) {
-            shotpos = Pos{row:r,col:c};
-          }
-      }
-    }
-
-    Move {
-      player: self.players_array[ix].clone(),
-      new_pos: other.players_array[ix].pos,
-      new_shot: shotpos,
-    }
-  }
-
 
   pub fn wall_set(&mut self, p: Pos, val: bool) {
     self.walls.set(p.to_linear(self.board_size) as u64, val);
