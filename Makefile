@@ -24,3 +24,8 @@ deploy:
 	    npx webpack"
 	echo "Check ./wasm-app/dist/"
 
+
+.PHONY: clean
+clean:
+	rm -rf rust/pkg
+	rm -rf website/dist
