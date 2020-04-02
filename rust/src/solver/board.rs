@@ -86,6 +86,15 @@ pub struct Move {
   pub new_shot: Pos,
 }
 
+/// Player and what they do.
+#[derive(Clone, Debug)]
+pub struct CompactMove {
+  pub player_ix: usize,
+  pub old_pos: Pos,
+  pub new_pos: Pos,
+  pub new_shot: Pos,
+}
+
 #[derive(Clone, Debug)]
 pub struct DistState {
   left: Vec<u8>,
@@ -269,23 +278,35 @@ impl Board {
   }
 
 
-  pub fn with_move(&self, player_ix: usize, pos: Pos, shot: Pos) -> Board {
-    let mut board = self.clone();
+  pub fn apply_move(&mut self, mv: &CompactMove) {
     // NOTE: this only works since valid players are before the
     // invalid players in the array, thus the indexes match
-    board.wall_set(self.players_array[player_ix].pos, false);
-    board.wall_set(pos, true);
-    board.wall_set(shot, true);
-    board.players_array[player_ix].pos = pos;
-    board
+    self.wall_set(self.players_array[mv.player_ix].pos, false);
+    self.wall_set(mv.new_pos, true);
+    self.wall_set(mv.new_shot, true);
+    self.players_array[mv.player_ix].pos = mv.new_pos;
   }
 
-  pub fn successors<'a>(&'a self, team: Team) -> impl Iterator<Item = Board> + 'a {
+  pub fn un_apply_move(&mut self, mv: &CompactMove) {
+    // NOTE: this only works since valid players are before the
+    // invalid players in the array, thus the indexes match
+    self.wall_set(self.players_array[mv.player_ix].pos, true);
+    self.wall_set(mv.new_pos, false);
+    self.wall_set(mv.new_shot, false);
+    self.players_array[mv.player_ix].pos = mv.old_pos;
+  }
+
+  pub fn successors<'a>(&'a self, team: Team) -> impl Iterator<Item = CompactMove> + 'a {
     self.players().enumerate().filter(move |(_,player)| player.team == team)
       .flat_map(move |(pi, player): (usize, &'a Player)| {
         queen_range(self, player.pos, player.pos).flat_map(move |pos: Pos| {
           queen_range(self, pos, player.pos).map(move |shot: Pos| {
-            self.with_move(pi, pos, shot)
+            CompactMove {
+              player_ix: pi,
+              old_pos: player.pos,
+              new_pos: pos,
+              new_shot: shot,
+            }
           })
         })
       })

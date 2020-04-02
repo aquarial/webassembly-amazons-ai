@@ -94,7 +94,14 @@ impl Amazons {
     }
     if let Some((pi, p)) = board.players().enumerate().find(|(_,play)| play.pos == pos) {
       if p.team == team {
-        self.boards.push(board.with_move(pi, mv, shot));
+        let mut b = board.clone();
+        b.apply_move(&CompactMove {
+          player_ix: pi,
+          old_pos: pos,
+          new_pos: mv,
+          new_shot: shot,
+        });
+        self.boards.push(b);
         return Ok(());
       }
     }
@@ -108,17 +115,18 @@ impl Amazons {
   /// Compute and make a move for an AI team.
   ///
   /// Return false if the AI gives up.
-  pub fn ai_move(&mut self, team: Team) -> bool {
+  pub fn ai_move(&mut self, team: Team) -> Option<CompactMove> {
     // TODO Multi-threading based on # of caches
     let c0 = &mut self.cache;
-    let board = &self.boards[self.boards.len() - 1];
+    let mut board = self.boards[self.boards.len() - 1].clone();
     return match max_move(&board, team, EvalStrategy::QueenDistance, 3, c0) {
       (Some(b), _) => {
-        self.boards.push(b);
-        true
+        board.apply_move(&b);
+        self.boards.push(board);
+        Some(b)
       }
       (None, _) => {
-        false
+        None
       }
     }
   }
@@ -141,10 +149,16 @@ impl Amazons {
   }
 }
 
-fn max_move(board: &Board, team: Team, strategy: EvalStrategy, depth: i32, cache: &mut DistState) -> (Option<Board>, i64) {
+fn max_move(board: &Board, team: Team, strategy: EvalStrategy, depth: i32, cache: &mut DistState) -> (Option<CompactMove>, i64) {
+  let mut local_board = board.clone();
   if depth <= 1 {
     let best = board.successors(team)
-      .map(|b| (evaluate_by_queen_bfs_distance(&b, team, cache), b))
+      .map(|b| {
+        local_board.apply_move(&b);
+        let s = evaluate_by_queen_bfs_distance(&local_board, team, cache);
+        local_board.un_apply_move(&b);
+        (s, b)
+      })
       .max_by_key(|it| it.0);
     if let Some((score, board)) = best {
       return (Some(board), score);
@@ -153,16 +167,23 @@ fn max_move(board: &Board, team: Team, strategy: EvalStrategy, depth: i32, cache
     }
   }
 
-  let mut best: Option<Board> = None;
+  let mut best: Option<CompactMove> = None;
   let mut score: i64 = i64::min_value() + 1;
 
-  for (_, b) in top_n(board.successors(team).map(|i| (evaluate_by_queen_bfs_distance(&i, team, cache), i))) {
+  for (_, b) in top_n(board.successors(team).map(|i| {local_board.apply_move(&i);
+                                                      let s = evaluate_by_queen_bfs_distance(&local_board, team, cache);
+                                                      local_board.un_apply_move(&i);
+                                                      (s, i)
+  })) {
     //if score != i64::min_value() && b.evaluate(team, dist_state) < starting_val - 1 {
     //    // can't do this in the end-game!
     //    //continue;
     //}
 
-    let (_, resp_score) = max_move(&b, team.other(), strategy, depth-1, cache);
+
+    local_board.apply_move(&b);
+    let (_, resp_score) = max_move(&local_board, team.other(), strategy, depth-1, cache);
+    local_board.un_apply_move(&b);
 
     if score < -resp_score {
       score = -resp_score;
@@ -177,8 +198,8 @@ fn max_move(board: &Board, team: Team, strategy: EvalStrategy, depth: i32, cache
   }
 }
 
-fn top_n(iter: impl Iterator<Item = (i64, Board)>) -> SmallVec<[(i64, Board); 15]> {
-  let mut vec = SmallVec::<[(i64, Board); 15]>::new();
+fn top_n(iter: impl Iterator<Item = (i64, CompactMove)>) -> SmallVec<[(i64, CompactMove); 15]> {
+  let mut vec = SmallVec::<[(i64, CompactMove); 15]>::new();
 
   iter.for_each(|new| {
     match vec.binary_search_by_key(& -new.0, |a| -a.0) {

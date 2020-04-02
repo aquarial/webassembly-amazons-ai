@@ -88,25 +88,26 @@ pub fn compute_ai_move(rb: &RequestedBoard) -> ReturnedMove {
   }
 
   let mut amazon = Amazons::from_board(board);
-  if amazon.ai_move(Team::Red) {
-    let m = amazon.compute_last_move();
+
+  if let Some(cm) = amazon.ai_move(Team::Red) {
     log(&amazon.nth_last_board(1).pprint());
     log(&amazon.nth_last_board(0).pprint());
     return ReturnedMove {
-      piece_y: m.player.pos.row as f64,
-      piece_x: m.player.pos.col as f64,
-      move_y: m.new_pos.row as f64,
-      move_x: m.new_pos.col as f64,
-      stone_y: m.new_shot.row as f64,
-      stone_x: m.new_shot.col as f64,
+      piece_y: cm.old_pos.row as f64,
+      piece_x: cm.old_pos.col as f64,
+      move_y: cm.new_pos.row as f64,
+      move_x: cm.new_pos.col as f64,
+      stone_y: cm.new_shot.row as f64,
+      stone_x: cm.new_shot.col as f64,
     }
+  } else {
+    return ReturnedMove {
+      piece_y: 0.0, piece_x: 0.0,
+      move_y: 0.0, move_x: 0.0,
+      stone_y: 0.0, stone_x: 0.0,
+    };
   }
 
-  return ReturnedMove {
-    piece_y: 0.0, piece_x: 0.0,
-    move_y: 0.0, move_x: 0.0,
-    stone_y: 0.0, stone_x: 0.0,
-  };
 }
 
 #[wasm_bindgen]
