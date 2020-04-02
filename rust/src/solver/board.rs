@@ -105,7 +105,6 @@ impl DistState {
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum EvalStrategy {
   QueenDistance,
-  KingDistance,
 }
 
 
@@ -294,17 +293,14 @@ impl Board {
 
   pub fn evaluate(&self, team: Team, strategy: EvalStrategy, dist_state: &mut DistState) -> i64 {
     match strategy {
-      EvalStrategy::KingDistance => {
-        self.bfs_eval(team, king_range, dist_state)
-      },
       EvalStrategy::QueenDistance => {
-        self.bfs_eval(team, queen_range, dist_state)
+        self.bfs_eval(team, dist_state)
       },
     }
   }
-  fn bfs_eval(&self, team: Team, succ: for<'a> fn(&'a Board, Pos, Pos) -> Box<dyn Iterator<Item = Pos> + 'a>, dist_state: &mut DistState) -> i64 {
-    self.bfs(team, succ, &mut dist_state.next, &mut dist_state.left);
-    self.bfs(team.other(), succ, &mut dist_state.next, &mut dist_state.right);
+  fn bfs_eval(&self, team: Team, dist_state: &mut DistState) -> i64 {
+    self.bfs(team, &mut dist_state.next, &mut dist_state.left);
+    self.bfs(team.other(), &mut dist_state.next, &mut dist_state.right);
 
     let mut score = 0;
     let mut is_end = true;
@@ -328,7 +324,7 @@ impl Board {
     return score;
   }
 
-  fn bfs(&self, team: Team, succ: for<'a> fn(&'a Board, Pos, Pos) -> Box<dyn Iterator<Item = Pos> + 'a>, next: &mut VecDeque<(Pos, u8)>, distances: &mut Vec<u8>) {
+  fn bfs(&self, team: Team, next: &mut VecDeque<(Pos, u8)>, distances: &mut Vec<u8>) {
     for i in 0..distances.len() {
       distances[i] = u8::max_value();
     }
@@ -339,7 +335,7 @@ impl Board {
       .for_each(|it| next.push_back(it));
 
     while let Some((pos,depth)) = next.pop_front() {
-      for neigh in succ(self, pos, pos) {
+      for neigh in queen_range(self, pos, pos) {
         let place = &mut distances[neigh.to_linear(self.board_size)];
         if depth + 1 < *place {
           *place = depth + 1;
@@ -355,13 +351,8 @@ const QUEEN_DIRS: [(i8,i8); 8] = [(-1,-1),(-1,0),(-1,1),
                                   ( 1,-1),( 1,0),( 1,1)];
 
 
-fn king_range<'a>(board: &'a Board, from: Pos, blank: Pos) -> Box<dyn Iterator<Item = Pos> + 'a> {
-  Box::new(QUEEN_DIRS.iter().map(move |dir| from.with_offset(*dir, 1))
-           .filter(move |place| !board.wall_at(*place) || *place == blank))
-}
-
-pub fn queen_range<'a>(board: &'a Board, from: Pos, blank: Pos) -> Box<dyn Iterator<Item = Pos> + 'a> {
-  Box::new(QUEEN_DIRS.iter().flat_map(move |dir|
-                                      (1..).map(move |dist| from.with_offset(*dir, dist))
-                                      .take_while(move |place| !board.wall_at(*place) || *place == blank)))
+fn queen_range<'a>(board: &'a Board, from: Pos, blank: Pos) -> impl Iterator<Item = Pos> + 'a {
+  QUEEN_DIRS.iter().flat_map(move |dir|
+                             (1..).map(move |dist| from.with_offset(*dir, dist))
+                             .take_while(move |place| !board.wall_at(*place) || *place == blank))
 }
