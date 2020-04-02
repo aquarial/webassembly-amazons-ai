@@ -29,11 +29,12 @@ impl Pos {
   /// Whether this position is axis-aligned
   /// with the other.
   pub fn in_a_line_with(&self, other: Pos) -> bool {
-    let dr = self.row.max(other.row) - self.row.min(other.row);
-    let dc = self.col.max(other.col) - self.col.min(other.col);
+    let dr = self.row - other.row;
+    let dc = self.col - other.col;
 
-    dr == 0 || dc == 0 || dr == dc
+    dr == 0 || dc == 0 || dr.abs() == dc.abs()
   }
+
   /// A path from `self` to `other`, which may
   /// walk diagonally.
   pub fn along_line(&self, other: Pos) -> Vec<Pos> {
@@ -56,10 +57,12 @@ impl Pos {
     }
     return v;
   }
+
   /// Coordinate flatten.
   pub fn to_linear(&self, num_cols: i8) -> usize {
     self.row as usize * num_cols as usize + self.col as usize
   }
+
   /// Calculate `self + (dir × dist)`
   pub fn with_offset(&self, dir: (i8, i8), dist: i8) -> Pos {
     Pos { row: self.row + dist * dir.0, col: self.col + dist * dir.1}
