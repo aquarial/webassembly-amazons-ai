@@ -72,6 +72,27 @@ impl RequestedBoard {
   }
 }
 
+fn is_int_in_range(val: f64, range:(f64, f64)) -> bool {
+  if !(range.0 <= val && val <= range.1) {
+    return false;
+  }
+  if val.floor() != val {
+    return false;
+  }
+  return true;
+}
+
+
+#[wasm_bindgen]
+pub struct ReturnedMove {
+  pub piece_y: i8,
+  pub piece_x: i8,
+  pub move_y: i8,
+  pub move_x: i8,
+  pub stone_y: i8,
+  pub stone_x: i8,
+}
+
 
 #[wasm_bindgen]
 pub fn compute_ai_move(rb: &RequestedBoard) -> ReturnedMove {
@@ -93,39 +114,20 @@ pub fn compute_ai_move(rb: &RequestedBoard) -> ReturnedMove {
     log(&amazon.nth_last_board(1).pprint());
     log(&amazon.nth_last_board(0).pprint());
     return ReturnedMove {
-      piece_y: cm.old_pos.row as f64,
-      piece_x: cm.old_pos.col as f64,
-      move_y: cm.new_pos.row as f64,
-      move_x: cm.new_pos.col as f64,
-      stone_y: cm.new_shot.row as f64,
-      stone_x: cm.new_shot.col as f64,
+      piece_y: cm.old_pos.row,
+      piece_x: cm.old_pos.col,
+      move_y: cm.new_pos.row,
+      move_x: cm.new_pos.col,
+      stone_y: cm.new_shot.row,
+      stone_x: cm.new_shot.col,
     }
   } else {
     return ReturnedMove {
-      piece_y: 0.0, piece_x: 0.0,
-      move_y: 0.0, move_x: 0.0,
-      stone_y: 0.0, stone_x: 0.0,
+      piece_y: 0, piece_x: 0,
+      move_y: 0, move_x: 0,
+      stone_y: 0, stone_x: 0,
     };
   }
 
 }
 
-#[wasm_bindgen]
-pub struct ReturnedMove {
-  pub piece_y: f64,
-  pub piece_x: f64,
-  pub move_y: f64,
-  pub move_x: f64,
-  pub stone_y: f64,
-  pub stone_x: f64,
-}
-
-fn is_int_in_range(val: f64, range:(f64, f64)) -> bool {
-  if !(range.0 <= val && val <= range.1) {
-    return false;
-  }
-  if val.floor() != val {
-    return false;
-  }
-  return true;
-}
