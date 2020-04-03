@@ -104,12 +104,6 @@ impl DistState {
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
-pub enum EvalStrategy {
-  QueenDistance,
-}
-
-
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum DrawableToken {
   Empty,
   Wall,

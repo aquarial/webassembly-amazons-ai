@@ -115,7 +115,7 @@ impl Amazons {
     // TODO Multi-threading based on # of caches
     let c0 = &mut self.cache;
     let mut board = self.boards[self.boards.len() - 1].clone();
-    return match max_move(&board, team, EvalStrategy::QueenDistance, 3, c0) {
+    return match max_move(&board, team, 3, c0) {
       (Some(b), _) => {
         board.apply_move(&b);
         self.boards.push(board);
@@ -145,7 +145,7 @@ impl Amazons {
   }
 }
 
-fn max_move(board: &Board, team: Team, strategy: EvalStrategy, depth: i32, cache: &mut DistState) -> (Option<CompactMove>, i64) {
+fn max_move(board: &Board, team: Team, depth: i32, cache: &mut DistState) -> (Option<CompactMove>, i64) {
   let mut local_board = board.clone();
 
   if depth <= 1 {
@@ -176,7 +176,7 @@ fn max_move(board: &Board, team: Team, strategy: EvalStrategy, depth: i32, cache
 
   for (_, b) in top_boards {
     local_board.apply_move(&b);
-    let (_, resp_score) = max_move(&local_board, team.other(), strategy, depth-1, cache);
+    let (_, resp_score) = max_move(&local_board, team.other(), depth-1, cache);
     local_board.un_apply_move(&b);
 
     if score < -resp_score {
@@ -186,7 +186,7 @@ fn max_move(board: &Board, team: Team, strategy: EvalStrategy, depth: i32, cache
   }
 
   match best {
-    None => max_move(board, team, strategy, 1, cache),
+    None => max_move(board, team, 1, cache),
     _ => (best, score)
 
   }
