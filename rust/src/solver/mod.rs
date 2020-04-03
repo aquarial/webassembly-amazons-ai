@@ -147,17 +147,18 @@ impl Amazons {
 
 fn max_move(board: &Board, team: Team, strategy: EvalStrategy, depth: i32, cache: &mut DistState) -> (Option<CompactMove>, i64) {
   let mut local_board = board.clone();
+
   if depth <= 1 {
     let best = board.successors(team)
-      .map(|b| {
-        local_board.apply_move(&b);
-        let s = evaluate_by_queen_bfs_distance(&local_board, team.other(), cache);
-        local_board.un_apply_move(&b);
-        (s, b)
+      .map(|mv| {
+        local_board.apply_move(&mv);
+        let eval = evaluate_by_queen_bfs_distance(&local_board, team.other(), cache);
+        local_board.un_apply_move(&mv);
+        (eval, mv)
       })
       .min_by_key(|it| it.0);
-    if let Some((score, board)) = best {
-      return (Some(board), score);
+    if let Some((score, mv)) = best {
+      return (Some(mv), score);
     } else {
       return (None, i64::min_value() + 1);
     }
@@ -166,17 +167,14 @@ fn max_move(board: &Board, team: Team, strategy: EvalStrategy, depth: i32, cache
   let mut best: Option<CompactMove> = None;
   let mut score: i64 = i64::min_value() + 1;
 
-  for (_, b) in top_n(board.successors(team).map(|i| {local_board.apply_move(&i);
-                                                      let s = evaluate_by_queen_bfs_distance(&local_board, team, cache);
-                                                      local_board.un_apply_move(&i);
-                                                      (s, i)
-  })) {
-    //if score != i64::min_value() && b.evaluate(team, dist_state) < starting_val - 1 {
-    //    // can't do this in the end-game!
-    //    //continue;
-    //}
+  let top_boards = top_n(board.successors(team).map(|m| {
+    local_board.apply_move(&m);
+    let eval = evaluate_by_queen_bfs_distance(&local_board, team, cache);
+    local_board.un_apply_move(&m);
+    return (eval, m);
+  }));
 
-
+  for (_, b) in top_boards {
     local_board.apply_move(&b);
     let (_, resp_score) = max_move(&local_board, team.other(), strategy, depth-1, cache);
     local_board.un_apply_move(&b);
