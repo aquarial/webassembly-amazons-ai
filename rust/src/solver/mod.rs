@@ -194,8 +194,8 @@ fn max_move(board: &Board, team: Team, strategy: EvalStrategy, depth: i32, cache
   }
 }
 
-fn top_n(iter: impl Iterator<Item = (i64, CompactMove)>) -> SmallVec<[(i64, CompactMove); 15]> {
-  let mut vec = SmallVec::<[(i64, CompactMove); 15]>::new();
+fn top_n<A>(iter: impl Iterator<Item = (i64, A)>) -> SmallVec<[(i64, A); 15]> {
+  let mut vec = SmallVec::<[(i64, A); 15]>::new();
 
   iter.for_each(|new| {
     match vec.binary_search_by_key(& -new.0, |a| -a.0) {
