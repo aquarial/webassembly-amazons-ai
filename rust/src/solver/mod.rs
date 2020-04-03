@@ -7,7 +7,6 @@ use smallvec::SmallVec;
 /// Data structures for amazon simulation,
 /// history-tracking, and AI.
 pub struct Amazons {
-  board_size: i8,
   boards: Vec<Board>,
   cache: DistState,
 }
@@ -16,7 +15,6 @@ pub struct Amazons {
 impl Amazons {
   pub fn from_board(board: Board) -> Amazons {
     Amazons {
-      board_size: board.board_size,
       cache: DistState::with_board_size(board.board_size),
       boards: vec![board],
     }
@@ -44,9 +42,9 @@ impl Amazons {
     let board = self.boards[self.boards.len() - 1].clone();
 
     for &coord in &[pos, mv, shot] {
-      if coord.row >= self.board_size || coord.col >= self.board_size {
+      if coord.row >= board.board_size || coord.col >= board.board_size {
         return Err(format!("Coord {:?} is outside board_size ({}, {})", coord,
-                           self.board_size, self.board_size));
+                           board.board_size, board.board_size));
       }
     }
     if pos == mv || mv == shot || !pos.in_a_line_with(mv) {
