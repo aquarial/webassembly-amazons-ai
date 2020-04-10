@@ -83,6 +83,7 @@ impl Amazons {
         };
         self.current.apply_move(&new_move);
         self.history.push(HistoryMove::Move(new_move));
+        self.history.truncate(100);
         return Ok(());
       }
     }
@@ -98,6 +99,7 @@ impl Amazons {
       (Some(m_move), _) => {
         self.current.apply_move(&m_move);
         self.history.push(HistoryMove::Move(m_move.clone()));
+        self.history.truncate(100);
         Some(m_move)
       }
       (None, _) => {
