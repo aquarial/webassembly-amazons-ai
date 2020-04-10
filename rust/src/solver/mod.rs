@@ -110,3 +110,19 @@ impl Amazons {
     }
   }
 }
+
+#[cfg(test)]
+mod tests {
+  use crate::solver::*;
+
+  #[test]
+  fn ai_move() {
+    let b = Board::new(6, vec![
+      Player{pos:Pos{row:1,col:1},team:Team::Red},
+      Player{pos:Pos{row:2,col:2},team:Team::Blue},
+    ]);
+    let mut a = Amazons::from_board(b);
+    println!("{:?}", a.ai_move(Team::Red));
+    assert_eq!(2 + 2, 4);
+  }
+}
