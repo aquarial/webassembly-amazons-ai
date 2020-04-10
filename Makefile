@@ -7,20 +7,20 @@ MAKEFLAGS += --no-builtin-rules
 
 .PHONY: build
 build:
-	nix-shell --command "wasm-pack build rust -- --features wee_alloc"
+	nix-shell --command "wasm-pack build rust"
 
 .PHONY: run-local
 run-local:
 	nix-shell --command "           \
-	    wasm-pack build rust/ -- --features wee_alloc    && \
+	    wasm-pack build rust/    && \
 	    cd website               && \
 	    npm run start"
 
 .PHONY: deploy
 deploy:
 	nix-shell --command "           \
-	    wasm-pack build rust/ -- --features wee_alloc        && \
-	    cd website                   && \
+	    wasm-pack build rust/    && \
+	    cd website               && \
 	    npx webpack"
 	echo "Check ./wasm-app/dist/"
 
