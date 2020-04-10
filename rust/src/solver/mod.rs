@@ -2,12 +2,19 @@ pub mod board;
 
 use board::*;
 use smallvec::SmallVec;
+use std::collections::VecDeque;
 
+
+enum HistoryMove {
+  NewGame(Board),
+  Move(CompactMove),
+}
 
 /// Data structures for amazon simulation,
 /// history-tracking, and AI.
 pub struct Amazons {
-  boards: Vec<Board>,
+  current: Board,
+  history: Vec<HistoryMove>,
   cache: DistState,
 }
 
@@ -15,22 +22,29 @@ pub struct Amazons {
 impl Amazons {
   pub fn from_board(board: Board) -> Amazons {
     Amazons {
+      current: board.clone(),
+      history: vec![HistoryMove::NewGame(board)],
       cache: DistState::new(),
-      boards: vec![board],
     }
   }
 
   /// Revert the last two moves.
-  pub fn undo_2_move(&mut self) {
-    if self.boards.len() >= 3 {
-      self.boards.pop();
-      self.boards.pop();
+  pub fn undo_move(&mut self) {
+    match self.history.pop() {
+      Some(HistoryMove::NewGame(b)) => {
+        self.current = b;
+      },
+      Some(HistoryMove::Move(m)) => {
+        self.current.un_apply_move(&m);
+      },
+      None => {
+      },
     }
   }
 
   /// All the pieces owned by a team.
   pub fn team_pieces<'s>(&'s self, team: Team) -> impl Iterator<Item=Pos> + 's {
-    self.boards[self.boards.len() - 1].players()
+    self.current.players()
       .filter(move |p| p.team == team)
       .map(|p| p.pos)
   }
@@ -39,7 +53,7 @@ impl Amazons {
   ///
   /// Return Err(msg) explaining the error if the move is invalid.
   pub fn player_move(&mut self, team: Team, pos: Pos, mv: Pos, shot: Pos) -> Result<(), String> {
-    let board = self.boards[self.boards.len() - 1].clone();
+    let board = self.current.clone();
 
     for &coord in &[pos, mv, shot] {
       if coord.row >= board.board_size || coord.col >= board.board_size {
@@ -61,14 +75,14 @@ impl Amazons {
     }
     if let Some((pi, p)) = board.players().enumerate().find(|(_,play)| play.pos == pos) {
       if p.team == team {
-        let mut b = board.clone();
-        b.apply_move(&CompactMove {
+        let new_move = CompactMove {
           player_ix: pi,
           old_pos: pos,
           new_pos: mv,
           new_shot: shot,
-        });
-        self.boards.push(b);
+        };
+        self.current.apply_move(&new_move);
+        self.history.push(HistoryMove::Move(new_move));
         return Ok(());
       }
     }
@@ -80,35 +94,16 @@ impl Amazons {
   /// Return false if the AI gives up.
   pub fn ai_move(&mut self, team: Team) -> Option<CompactMove> {
     // TODO Multi-threading based on # of caches
-    let c0 = &mut self.cache;
-    let mut board = self.boards[self.boards.len() - 1].clone();
-    return match max_move(&board, team, 3, c0) {
-      (Some(b), _) => {
-        board.apply_move(&b);
-        self.boards.push(board);
-        Some(b)
+    return match max_move(&self.current, team, 3, &mut self.cache) {
+      (Some(m_move), _) => {
+        self.current.apply_move(&m_move);
+        self.history.push(HistoryMove::Move(m_move.clone()));
+        Some(m_move)
       }
       (None, _) => {
         None
       }
     }
-  }
-
-  /// Look back in history for a board state.
-  ///
-  /// If the index is too far back in time, this
-  /// returns the first board in history.
-  pub fn nth_last_board(&self, i: usize) -> Board {
-    if self.boards.len() > i {
-      return self.boards[self.boards.len() - 1 - i].clone();
-    } else {
-      return self.boards[0].clone();
-    }
-  }
-
-  /// The most recent board state.
-  pub fn curr_board(&self) -> &Board {
-    return &self.boards[self.boards.len() - 1];
   }
 }
 

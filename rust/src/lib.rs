@@ -111,8 +111,8 @@ pub fn compute_ai_move(rb: &RequestedBoard) -> ReturnedMove {
   let mut amazon = Amazons::from_board(board);
 
   if let Some(cm) = amazon.ai_move(Team::Red) {
-    log(&amazon.nth_last_board(1).pprint());
-    log(&amazon.nth_last_board(0).pprint());
+    // log(&amazon.nth_last_board(1).pprint());
+    // log(&amazon.nth_last_board(0).pprint());
     return ReturnedMove {
       piece_y: cm.old_pos.row,
       piece_x: cm.old_pos.col,
