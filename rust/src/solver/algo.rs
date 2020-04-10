@@ -21,12 +21,11 @@ pub fn smart_min_max(cache: &mut DistState, board: &Board, team: Team) -> (Optio
         break;
       }
     }
-    if other.0 > 0 {
-      if eval > other.1 {
-        moves[other.0 as usize] = (m, eval);
-      }
-    } else {
+    if other.0 == -1 {
       moves.push((m, eval));
+      moves.truncate(4);
+    } else if eval > other.1 {
+      moves[other.0 as usize] = (m, eval);
     }
   }
 
@@ -47,7 +46,6 @@ pub fn smart_min_max(cache: &mut DistState, board: &Board, team: Team) -> (Optio
   match best {
     None => min_max(cache, board, team, 1),
     _ => (best, score)
-
   }
 }
 

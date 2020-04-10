@@ -22,7 +22,7 @@ extern {
 
 #[wasm_bindgen]
 pub struct RequestedBoard {
-  pub size:   f64,
+  pub size: f64,
   blocks:  Vec<(f64, f64)>,
   red_team: Vec<(f64, f64)>,
   blue_team: Vec<(f64, f64)>,
