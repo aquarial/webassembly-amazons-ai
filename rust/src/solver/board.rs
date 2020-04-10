@@ -302,7 +302,7 @@ fn bfs(board: &Board, team: Team, next: &mut VecDeque<(Pos, u8)>, distances: &mu
   for i in 0..distances.len() {
     distances[i] = u8::max_value();
   }
-  for _ in distances.len()..(board.board_size as usize) {
+  while distances.len() < (board.board_size * board.board_size) as usize {
     distances.push(u8::max_value());
   }
   next.clear();
