@@ -97,7 +97,7 @@ impl Amazons {
   pub fn ai_move(&mut self, team: Team) -> Option<CompactMove> {
     // TODO Multi-threading based on # of caches
     let cache = &mut self.cache;
-    return match algo::min_max(cache, &self.current, team, 3) {
+    return match algo::smart_min_max(cache, &self.current, team) {
       (Some(m_move), _) => {
         self.current.apply_move(&m_move);
         self.history.push(HistoryMove::Move(m_move.clone()));
