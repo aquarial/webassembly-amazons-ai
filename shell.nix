@@ -9,6 +9,5 @@ pkgs.mkShell {
   buildInputs = [
     pkgs.wasm-pack
     pkgs.nodejs-12_x
-    pkgs.vscode
   ];
 }
