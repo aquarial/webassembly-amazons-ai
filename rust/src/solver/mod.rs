@@ -15,7 +15,7 @@ pub struct Amazons {
 impl Amazons {
   pub fn from_board(board: Board) -> Amazons {
     Amazons {
-      cache: DistState::with_board_size(board.board_size),
+      cache: DistState::new(),
       boards: vec![board],
     }
   }

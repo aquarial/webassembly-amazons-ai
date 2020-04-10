@@ -94,10 +94,10 @@ pub struct DistState {
   next: VecDeque<(Pos, u8)>,
 }
 impl DistState {
-  pub fn with_board_size(board_size: i8) -> DistState {
+  pub fn new() -> DistState {
     DistState {
-      left: vec![0; board_size as usize * board_size as usize],
-      right: vec![0; board_size as usize * board_size as usize],
+      left: Vec::new(),
+      right: Vec::new(),
       next: VecDeque::new(),
     }
   }
@@ -301,6 +301,9 @@ pub fn evaluate_by_queen_bfs_distance(board: &Board, team: Team, dist_state: &mu
 fn bfs(board: &Board, team: Team, next: &mut VecDeque<(Pos, u8)>, distances: &mut Vec<u8>) {
   for i in 0..distances.len() {
     distances[i] = u8::max_value();
+  }
+  for _ in distances.len()..(board.board_size as usize) {
+    distances.push(u8::max_value());
   }
   next.clear();
   board.players()
