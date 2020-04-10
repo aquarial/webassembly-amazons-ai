@@ -4,7 +4,19 @@ use smallvec::SmallVec;
 use std::collections::VecDeque;
 
 
-pub fn max_move(board: &Board, team: Team, depth: i32, cache: &mut DistState) -> (Option<CompactMove>, i64) {
+pub enum Strategy {
+  MinMax3,
+}
+
+pub fn max_move(cache: &mut DistState, board: &Board, team: Team, strat: Strategy) -> (Option<CompactMove>, i64) {
+  match strat {
+    Strategy::MinMax3 => {
+      mm3(cache, board, team, 3)
+    }
+  }
+}
+
+pub fn mm3(cache: &mut DistState, board: &Board, team: Team, depth: i32) -> (Option<CompactMove>, i64) {
   let mut local_board = board.clone();
 
   if depth <= 1 {
@@ -35,7 +47,7 @@ pub fn max_move(board: &Board, team: Team, depth: i32, cache: &mut DistState) ->
 
   for (_, b) in top_boards {
     local_board.apply_move(&b);
-    let (_, resp_score) = max_move(&local_board, team.other(), depth-1, cache);
+    let (_, resp_score) = mm3(cache, &local_board, team.other(), depth-1);
     local_board.un_apply_move(&b);
 
     if score < -resp_score {
@@ -45,7 +57,7 @@ pub fn max_move(board: &Board, team: Team, depth: i32, cache: &mut DistState) ->
   }
 
   match best {
-    None => max_move(board, team, 1, cache),
+    None => mm3(cache, board, team, 1),
     _ => (best, score)
 
   }

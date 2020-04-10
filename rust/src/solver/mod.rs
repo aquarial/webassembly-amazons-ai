@@ -2,7 +2,6 @@ pub mod board;
 pub mod algo;
 
 use board::*;
-use algo::*;
 use smallvec::SmallVec;
 use std::collections::VecDeque;
 
@@ -97,7 +96,8 @@ impl Amazons {
   /// Return false if the AI gives up.
   pub fn ai_move(&mut self, team: Team) -> Option<CompactMove> {
     // TODO Multi-threading based on # of caches
-    return match max_move(&self.current, team, 3, &mut self.cache) {
+    let cache = &mut self.cache;
+    return match algo::max_move(cache, &self.current, team, algo::Strategy::MinMax3) {
       (Some(m_move), _) => {
         self.current.apply_move(&m_move);
         self.history.push(HistoryMove::Move(m_move.clone()));
