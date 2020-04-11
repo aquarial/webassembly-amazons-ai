@@ -29,7 +29,7 @@ impl Amazons {
     }
   }
 
-  /// Revert the last two moves.
+  /// Revert the last move.
   pub fn undo_move(&mut self) {
     match self.history.pop() {
       Some(HistoryMove::NewGame(b)) => {
