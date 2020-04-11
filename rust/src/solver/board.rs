@@ -239,7 +239,7 @@ impl Board {
   pub fn apply_move(&mut self, mv: &CompactMove) {
     // NOTE: this only works since valid players are before the
     // invalid players in the array, thus the indexes match
-    self.wall_set(self.players_array[mv.player_ix].pos, false);
+    self.wall_set(mv.old_pos, false);
     self.wall_set(mv.new_pos, true);
     self.wall_set(mv.new_shot, true);
     self.players_array[mv.player_ix].pos = mv.new_pos;
@@ -248,9 +248,9 @@ impl Board {
   pub fn un_apply_move(&mut self, mv: &CompactMove) {
     // NOTE: this only works since valid players are before the
     // invalid players in the array, thus the indexes match
-    self.wall_set(self.players_array[mv.player_ix].pos, true);
     self.wall_set(mv.new_pos, false);
     self.wall_set(mv.new_shot, false);
+    self.wall_set(mv.old_pos, true);
     self.players_array[mv.player_ix].pos = mv.old_pos;
   }
 
