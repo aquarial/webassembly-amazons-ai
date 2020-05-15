@@ -2,9 +2,6 @@ pub mod board;
 pub mod algo;
 
 use board::*;
-use smallvec::SmallVec;
-use std::collections::VecDeque;
-
 
 enum HistoryMove {
   NewGame(Board),
@@ -44,10 +41,11 @@ impl Amazons {
   }
 
   /// All the pieces owned by a team.
-  pub fn team_pieces<'s>(&'s self, team: Team) -> impl Iterator<Item=Pos> + 's {
+  pub fn team_pieces(&self, team: Team) -> Vec<Pos> {
     self.current.players()
       .filter(move |p| p.team == team)
       .map(|p| p.pos)
+      .collect()
   }
 
   /// Try to record a player's move
