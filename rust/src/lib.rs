@@ -34,9 +34,9 @@ impl RequestedBoard {
   pub fn add_blue_team(&mut self, y:f64, x:f64) {self.blue_team.push((y,x));}
   pub fn add_block(&mut self,  y:f64, x:f64) {self.blocks.push((y,x));}
 
-  pub fn new() -> RequestedBoard {
+  pub fn new(size: f64) -> RequestedBoard {
     RequestedBoard {
-      size: 0.0,
+      size: size,
       red_team: Vec::new(),
       blue_team: Vec::new(),
       blocks: Vec::new(),

@@ -8,7 +8,6 @@ import { DrawState } from "./drawstate.js";
 /** @type {((dt: number, totaltime: number) => void)[]} */
 let animations = [];
 
-
 {
   /** @type {HTMLCanvasElement} */
   let canvas = (document.getElementById("thecanvas"));
@@ -51,8 +50,7 @@ let animations = [];
   /** @type {HTMLButtonElement} */
   let makeai = (document.getElementById("makeai"));
   makeai.onmousedown = function (event) {
-    let board = wasm.RequestedBoard.new();
-    board.size = gameboard.width;
+    let board = wasm.RequestedBoard.new(gameboard.width);
     for (let y = 1; y <= gameboard.height; y++) {
       for (let x = 1; x <= gameboard.width; x++) {
         let at = gameboard.atYX(y, x);
