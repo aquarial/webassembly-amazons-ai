@@ -21,6 +21,45 @@ extern {
 }
 
 #[wasm_bindgen]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub struct DrawableToken {
+  pub wall: bool,
+  pub piece: Team,
+  pub hoverwall: bool,
+  pub hoverpiece: bool,
+}
+
+#[wasm_bindgen]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+pub struct DrawableBoard {
+  board: Vec<Vec<DrawableToken>>,
+}
+
+impl DrawableBoard {
+  pub fn new(from: &Board) -> DrawableBoard {
+    let dt = DrawableToken { wall: false, piece: Team::Red, hoverwall: false, hoverpiece: false};
+    let mut tokens = vec![
+      vec![dt; from.board_size as usize];
+          from.board_size as usize
+      ];
+
+      for r in 0..from.board_size {
+        for c in 0..from.board_size {
+          if from.wall_at(Pos { row: r, col: c}) {
+            tokens[r as usize][c as usize].wall = true;
+          }
+        }
+      }
+    for p in from.players() {
+      tokens[p.pos.row as usize][p.pos.col as usize].piece = p.team;
+    }
+    DrawableBoard {
+      board: tokens,
+    }
+  }
+}
+
+#[wasm_bindgen]
 pub struct RequestedBoard {
   pub size: f64,
   blocks:  Vec<(f64, f64)>,
