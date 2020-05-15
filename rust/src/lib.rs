@@ -46,6 +46,23 @@ impl State {
       drawstate: drawboard,
     }
   }
+
+  pub fn turn(&self) -> Team {
+    self.turn
+  }
+
+  pub fn size(&self) -> i8 {
+    self.gamestate.current().board_size - 2
+  }
+
+  pub fn token(&self, row: f64, col: f64) -> DrawableToken {
+    if !is_int_in_range(row, (1.0, self.size() as f64))
+      || !is_int_in_range(col, (1.0, self.size() as f64)) {
+      log(&format!("State.token({}, {}) out of (0, {}) range!",
+        row, col, self.size()));
+    }
+    self.drawstate.board[row as usize][col as usize]
+  }
 }
 
 #[wasm_bindgen]
