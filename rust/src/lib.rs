@@ -21,6 +21,35 @@ extern {
 }
 
 #[wasm_bindgen]
+pub struct State {
+  gamestate: Amazons,
+  drawstate: DrawableBoard,
+  turn: Team,
+}
+
+
+#[wasm_bindgen]
+impl State {
+  pub fn new() -> State {
+    let board_size = 8 + 2;
+    let mut players = Vec::new();
+    players.push(Player{ team:Team::Red, pos:Pos {row:  2, col:  2} });
+    players.push(Player{ team:Team::Red, pos:Pos {row:  2, col:  4} });
+    players.push(Player{ team:Team::Blue, pos:Pos {row:  4, col:  2} });
+    players.push(Player{ team:Team::Blue, pos:Pos {row:  4, col:  4} });
+    let amazons = Amazons::from_board(Board::new(board_size, players));
+
+    let drawboard = DrawableBoard::new(amazons.current());
+
+    State {
+      turn: Team::Red,
+      gamestate: amazons,
+      drawstate: drawboard,
+    }
+  }
+}
+
+#[wasm_bindgen]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct DrawableToken {
   pub wall: bool,
