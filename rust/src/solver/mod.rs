@@ -40,6 +40,11 @@ impl Amazons {
     }
   }
 
+  /// Reference to current board
+  pub fn current(&self) -> &Board {
+    &self.current()
+  } 
+
   /// All the pieces owned by a team.
   pub fn team_pieces(&self, team: Team) -> Vec<Pos> {
     self.current.players()
