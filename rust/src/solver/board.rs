@@ -1,7 +1,9 @@
 use bv::BitVec;
 use std::collections::VecDeque;
+use wasm_bindgen::prelude::*;
 
 /// Red or Blue.
+#[wasm_bindgen]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum Team {
   Red,
