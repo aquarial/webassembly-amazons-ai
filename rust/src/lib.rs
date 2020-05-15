@@ -47,6 +47,15 @@ impl State {
     }
   }
 
+  pub fn mouse_move(&self, row: f64, col: f64) {
+    if !is_int_in_range(row, (1.0, self.size() as f64))
+      || !is_int_in_range(col, (1.0, self.size() as f64)) {
+      log(&format!("State.mouse_move({}, {}) out of (0, {}) range!",
+        row, col, self.size()));
+    }
+    self.drawstate.mouse_move(row as usize, col as usize);
+  }
+
   pub fn turn(&self) -> Team {
     self.turn
   }
@@ -107,6 +116,10 @@ impl DrawableBoard {
     }
   }
 
+  pub fn mouse_move(&self, row: usize, col: usize) {
+    if row == self.mouse.row as usize && col == self.mouse.col as usize {
+      return;
+    }
   }
 }
 
