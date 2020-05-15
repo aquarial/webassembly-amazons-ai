@@ -67,7 +67,10 @@ impl Pos {
 
   /// Calculate `self + (dir × dist)`
   pub fn with_offset(&self, dir: (i8, i8), dist: i8) -> Pos {
-    Pos { row: self.row + dist * dir.0, col: self.col + dist * dir.1}
+    Pos {
+      row: self.row + dist * dir.0,
+      col: self.col + dist * dir.1,
+    }
   }
 }
 
@@ -117,12 +120,12 @@ pub struct Board {
 
 impl Board {
   pub fn new(board_size: i8, players: Vec<Player>) -> Board {
-    let mut b = BitVec::new_fill(false, (board_size*board_size) as u64);
+    let mut b = BitVec::new_fill(false, (board_size * board_size) as u64);
 
     for r in 0..board_size {
       for c in 0..board_size {
-        if r == 0 || c == 0 || r == board_size-1 || c == board_size-1 {
-          b.set((r * board_size + c) as u64,  true);
+        if r == 0 || c == 0 || r == board_size - 1 || c == board_size - 1 {
+          b.set((r * board_size + c) as u64, true);
         }
       }
     }
@@ -134,7 +137,7 @@ impl Board {
     assert!(players.len() >= 1);
     let mut pa = [Player { pos: Pos {row:0, col:0}, team: Team::Red }; MAX_NUM_PLAYERS];
     for (pi, p) in players.into_iter().enumerate() {
-      assert!(p.pos != Pos {row: 0, col: 0});
+      assert!(p.pos != Pos { row: 0, col: 0 });
       pa[pi] = p;
     }
 
@@ -156,7 +159,7 @@ impl Board {
     let mut s = String::new();
     for r in 0..self.board_size {
       for c in 0..self.board_size {
-        let pos = Pos { row: r, col: c};
+        let pos = Pos { row: r, col: c };
         match self.players().find(|p| p.pos == pos) {
           Some(p) => {
             if !self.wall_at(pos) {
@@ -172,7 +175,7 @@ impl Board {
                 s.push('W');
               }
             }
-          },
+          }
           None => {
             if self.wall_at(pos) {
               s.push('#')
@@ -188,9 +191,11 @@ impl Board {
   }
 
   pub fn players(&self) -> impl Iterator<Item = &Player> {
-    self.players_array.iter().filter(|p| p.pos != Pos { row:0, col: 0})
+    self
+      .players_array
+      .iter()
+      .filter(|p| p.pos != Pos { row: 0, col: 0 })
   }
-
 
   pub fn apply_move(&mut self, mv: &CompactMove) {
     // NOTE: this only works since valid players are before the
@@ -211,7 +216,10 @@ impl Board {
   }
 
   pub fn successors<'a>(&'a self, team: Team) -> impl Iterator<Item = CompactMove> + 'a {
-    self.players().enumerate().filter(move |(_,player)| player.team == team)
+    self
+      .players()
+      .enumerate()
+      .filter(move |(_, player)| player.team == team)
       .flat_map(move |(pi, player): (usize, &'a Player)| {
         queen_range(self, player.pos, player.pos).flat_map(move |pos: Pos| {
           queen_range(self, pos, player.pos).map(move |shot: Pos| {
@@ -227,14 +235,13 @@ impl Board {
   }
 }
 
-
 pub fn evaluate_by_queen_bfs_distance(board: &Board, team: Team, dist_state: &mut DistState) -> i64 {
   bfs(board, team, &mut dist_state.next, &mut dist_state.left);
   bfs(board, team.other(), &mut dist_state.next, &mut dist_state.right);
 
   let mut score = 0;
   let mut is_end = true;
-  for (&a,&b) in dist_state.left.iter().zip(dist_state.right.iter()) {
+  for (&a, &b) in dist_state.left.iter().zip(dist_state.right.iter()) {
     if a < b {
       score = score + 1;
     }
@@ -262,22 +269,22 @@ fn bfs(board: &Board, team: Team, next: &mut VecDeque<(Pos, u8)>, distances: &mu
     distances.push(u8::max_value());
   }
   next.clear();
-  board.players()
+  board
+    .players()
     .filter(|p| p.team == team)
     .map(|p| (p.pos, 0))
     .for_each(|it| next.push_back(it));
 
-  while let Some((pos,depth)) = next.pop_front() {
+  while let Some((pos, depth)) = next.pop_front() {
     for neigh in queen_range(board, pos, pos) {
       let place = &mut distances[neigh.to_linear(board.board_size)];
       if depth + 1 < *place {
         *place = depth + 1;
-        next.push_back((neigh, depth+1));
+        next.push_back((neigh, depth + 1));
       }
     }
   }
 }
-
 
 const QUEEN_DIRS: [(i8,i8); 8] = [(-1,-1),(-1,0),(-1,1),
                                   ( 0,-1)       ,( 0,1),
@@ -285,7 +292,9 @@ const QUEEN_DIRS: [(i8,i8); 8] = [(-1,-1),(-1,0),(-1,1),
 
 
 fn queen_range<'a>(board: &'a Board, from: Pos, blank: Pos) -> impl Iterator<Item = Pos> + 'a {
-  QUEEN_DIRS.iter().flat_map(move |dir|
-                             (1..).map(move |dist| from.with_offset(*dir, dist))
-                             .take_while(move |place| !board.wall_at(*place) || *place == blank))
+  QUEEN_DIRS.iter().flat_map(move |dir| {
+    (1..)
+      .map(move |dist| from.with_offset(*dir, dist))
+      .take_while(move |place| !board.wall_at(*place) || *place == blank)
+  })
 }

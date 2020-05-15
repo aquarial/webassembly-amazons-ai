@@ -1,5 +1,5 @@
-pub mod board;
 pub mod algo;
+pub mod board;
 
 use board::*;
 
@@ -16,7 +16,6 @@ pub struct Amazons {
   cache: DistState,
 }
 
-
 impl Amazons {
   pub fn from_board(board: Board) -> Amazons {
     Amazons {
@@ -31,23 +30,24 @@ impl Amazons {
     match self.history.pop() {
       Some(HistoryMove::NewGame(b)) => {
         self.current = b;
-      },
+      }
       Some(HistoryMove::Move(m)) => {
         self.current.un_apply_move(&m);
-      },
-      None => {
-      },
+      }
+      None => {}
     }
   }
 
   /// Reference to current board
   pub fn current(&self) -> &Board {
     &self.current()
-  } 
+  }
 
   /// All the pieces owned by a team.
   pub fn team_pieces(&self, team: Team) -> Vec<Pos> {
-    self.current.players()
+    self
+      .current
+      .players()
       .filter(move |p| p.team == team)
       .map(|p| p.pos)
       .collect()
@@ -61,8 +61,10 @@ impl Amazons {
 
     for &coord in &[pos, mv, shot] {
       if coord.row >= board.board_size || coord.col >= board.board_size {
-        return Err(format!("Coord {:?} is outside board_size ({}, {})", coord,
-                           board.board_size, board.board_size));
+        return Err(format!(
+          "Coord {:?} is outside board_size ({}, {})",
+          coord, board.board_size, board.board_size
+        ));
       }
     }
     if pos == mv || mv == shot || !pos.in_a_line_with(mv) {
@@ -107,10 +109,8 @@ impl Amazons {
         self.history.truncate(100);
         Some(m_move)
       }
-      (None, _) => {
-        None
-      }
-    }
+      (None, _) => None,
+    };
   }
 }
 

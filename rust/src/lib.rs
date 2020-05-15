@@ -1,8 +1,8 @@
-mod utils;
 mod solver;
+mod utils;
 
-use solver::*;
 use solver::board::*;
+use solver::*;
 
 use wasm_bindgen::prelude::*;
 
@@ -13,7 +13,7 @@ use wasm_bindgen::prelude::*;
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
 #[wasm_bindgen]
-extern {
+extern "C" {
   // fn alert(s: &str);
 
   #[wasm_bindgen(js_namespace = console)]
@@ -26,7 +26,6 @@ pub struct State {
   drawstate: DrawableBoard,
   turn: Team,
 }
-
 
 #[wasm_bindgen]
 impl State {
@@ -66,41 +65,47 @@ pub struct DrawableBoard {
 
 impl DrawableBoard {
   pub fn new(from: &Board) -> DrawableBoard {
-    let dt = DrawableToken { wall: false, piece: Team::Red, hoverwall: false, hoverpiece: false};
-    let mut tokens = vec![
-      vec![dt; from.board_size as usize];
-          from.board_size as usize
-      ];
+    let dt = DrawableToken {
+      wall: false,
+      piece: Team::Red,
+      hoverwall: false,
+      hoverpiece: false,
+    };
+    let mut tokens = vec![vec![dt; from.board_size as usize]; from.board_size as usize];
 
-      for r in 0..from.board_size {
-        for c in 0..from.board_size {
-          if from.wall_at(Pos { row: r, col: c}) {
-            tokens[r as usize][c as usize].wall = true;
-          }
+    for r in 0..from.board_size {
+      for c in 0..from.board_size {
+        if from.wall_at(Pos { row: r, col: c }) {
+          tokens[r as usize][c as usize].wall = true;
         }
       }
+    }
     for p in from.players() {
       tokens[p.pos.row as usize][p.pos.col as usize].piece = p.team;
     }
-    DrawableBoard {
-      board: tokens,
-    }
+    DrawableBoard { board: tokens }
   }
 }
 
 #[wasm_bindgen]
 pub struct RequestedBoard {
   pub size: f64,
-  blocks:  Vec<(f64, f64)>,
+  blocks: Vec<(f64, f64)>,
   red_team: Vec<(f64, f64)>,
   blue_team: Vec<(f64, f64)>,
 }
 
 #[wasm_bindgen]
 impl RequestedBoard {
-  pub fn add_red_team(&mut self, y:f64, x:f64) {self.red_team.push((y,x));}
-  pub fn add_blue_team(&mut self, y:f64, x:f64) {self.blue_team.push((y,x));}
-  pub fn add_block(&mut self,  y:f64, x:f64) {self.blocks.push((y,x));}
+  pub fn add_red_team(&mut self, y: f64, x: f64) {
+    self.red_team.push((y, x));
+  }
+  pub fn add_blue_team(&mut self, y: f64, x: f64) {
+    self.blue_team.push((y, x));
+  }
+  pub fn add_block(&mut self, y: f64, x: f64) {
+    self.blocks.push((y, x));
+  }
 
   pub fn new(size: f64) -> RequestedBoard {
     RequestedBoard {
@@ -111,26 +116,25 @@ impl RequestedBoard {
     }
   }
 
-
   pub fn is_valid(&self) -> bool {
     // [1, width]  [1, height]
     if !is_int_in_range(self.size, (1.0, 10.0)) {
       return false;
     }
 
-    for &(y,x) in &self.red_team {
+    for &(y, x) in &self.red_team {
       if !is_int_in_range(y, (1.0, self.size)) || !is_int_in_range(x, (1.0, self.size)) {
         return false;
       }
     }
 
-    for &(y,x) in &self.blue_team {
+    for &(y, x) in &self.blue_team {
       if !is_int_in_range(y, (1.0, self.size)) || !is_int_in_range(x, (1.0, self.size)) {
         return false;
       }
     }
 
-    for &(y,x) in &self.blocks {
+    for &(y, x) in &self.blocks {
       if !is_int_in_range(y, (1.0, self.size)) || !is_int_in_range(x, (1.0, self.size)) {
         return false;
       }
@@ -140,7 +144,7 @@ impl RequestedBoard {
   }
 }
 
-fn is_int_in_range(val: f64, range:(f64, f64)) -> bool {
+fn is_int_in_range(val: f64, range: (f64, f64)) -> bool {
   if !(range.0 <= val && val <= range.1) {
     return false;
   }
@@ -149,7 +153,6 @@ fn is_int_in_range(val: f64, range:(f64, f64)) -> bool {
   }
   return true;
 }
-
 
 #[wasm_bindgen]
 pub struct ReturnedMove {
@@ -160,7 +163,6 @@ pub struct ReturnedMove {
   pub stone_y: i8,
   pub stone_x: i8,
 }
-
 
 #[wasm_bindgen]
 pub fn compute_ai_move(rb: &RequestedBoard) -> ReturnedMove {
@@ -188,7 +190,7 @@ pub fn compute_ai_move(rb: &RequestedBoard) -> ReturnedMove {
       move_x: cm.new_pos.col,
       stone_y: cm.new_shot.row,
       stone_x: cm.new_shot.col,
-    }
+    };
   } else {
     return ReturnedMove {
       piece_y: 0, piece_x: 0,
@@ -196,6 +198,4 @@ pub fn compute_ai_move(rb: &RequestedBoard) -> ReturnedMove {
       stone_y: 0, stone_x: 0,
     };
   }
-
 }
-

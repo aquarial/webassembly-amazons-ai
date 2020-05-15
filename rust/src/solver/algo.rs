@@ -1,7 +1,5 @@
-
 use crate::board::*;
 use smallvec::SmallVec;
-
 
 pub fn min_max(cache: &mut DistState, board: &Board, team: Team, depth: i32) -> (Option<CompactMove>, i64) {
   let mut local_board = board.clone();
@@ -34,7 +32,7 @@ pub fn min_max(cache: &mut DistState, board: &Board, team: Team, depth: i32) -> 
 
   for (_, b) in top_boards {
     local_board.apply_move(&b);
-    let (_, resp_score) = min_max(cache, &local_board, team.other(), depth-1);
+    let (_, resp_score) = min_max(cache, &local_board, team.other(), depth - 1);
     local_board.un_apply_move(&b);
 
     if score < -resp_score {
@@ -45,8 +43,7 @@ pub fn min_max(cache: &mut DistState, board: &Board, team: Team, depth: i32) -> 
 
   match best {
     None => min_max(cache, board, team, 1),
-    _ => (best, score)
-
+    _ => (best, score),
   }
 }
 
@@ -54,7 +51,7 @@ fn top_n<A>(iter: impl Iterator<Item = (i64, A)>) -> SmallVec<[(i64, A); 15]> {
   let mut vec = SmallVec::<[(i64, A); 15]>::new();
 
   iter.for_each(|new| {
-    match vec.binary_search_by_key(& -new.0, |a| -a.0) {
+    match vec.binary_search_by_key(&-new.0, |a| -a.0) {
       Ok(i) => vec.insert(i, new),
       Err(i) => vec.insert(i, new),
     }
