@@ -105,26 +105,6 @@ impl DistState {
   }
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
-pub enum DrawableToken {
-  Empty,
-  Wall,
-  Piece(Team),
-}
-
-#[derive(Clone, Debug, PartialEq, Eq, Hash)]
-pub struct DrawableBoard {
-  pub board: Vec<Vec<DrawableToken>>,
-}
-impl DrawableBoard {
-  pub fn new() -> DrawableBoard {
-    DrawableBoard {
-      board: Vec::new(),
-    }
-  }
-}
-
-
 const MAX_NUM_PLAYERS: usize = 4;
 
 /// Game state at an instant.
@@ -170,32 +150,6 @@ impl Board {
   }
   pub fn wall_at(&self, p: Pos) -> bool {
     self.walls.get((p.to_linear(self.board_size)) as u64)
-  }
-
-  pub fn draw_board(&self, draw: &mut DrawableBoard) {
-    draw.board.truncate(self.board_size as usize);
-    while draw.board.len() < self.board_size as usize {
-      draw.board.push(Vec::new());
-    }
-    for r in 0..self.board_size as usize {
-      draw.board[r].truncate(self.board_size as usize);
-      while draw.board[r].len() < self.board_size as usize {
-        draw.board[r].push(DrawableToken::Empty);
-      }
-    }
-    for r in 0..self.board_size {
-      for c in 0..self.board_size {
-        if self.wall_at(Pos { row: r, col: c }) {
-          draw.board[r as usize][c as usize] = DrawableToken::Wall;
-        } else {
-          draw.board[r as usize][c as usize] = DrawableToken::Empty;
-        }
-      }
-    }
-    for p in self.players() {
-      let dt = DrawableToken::Piece(p.team);
-      draw.board[p.pos.row as usize][p.pos.col as usize] = dt;
-    }
   }
 
   pub fn pprint(&self) -> String {
