@@ -66,18 +66,19 @@ impl State {
 }
 
 #[wasm_bindgen]
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct DrawableToken {
   pub wall: bool,
   pub piece: Team,
-  pub hoverwall: bool,
-  pub hoverpiece: bool,
 }
 
 #[wasm_bindgen]
-#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct DrawableBoard {
   board: Vec<Vec<DrawableToken>>,
+  mouse: Pos,
+  selected_piece: Option<Pos>,
+  selected_move: Option<Pos>,
 }
 
 impl DrawableBoard {
@@ -85,8 +86,6 @@ impl DrawableBoard {
     let dt = DrawableToken {
       wall: false,
       piece: Team::Red,
-      hoverwall: false,
-      hoverpiece: false,
     };
     let mut tokens = vec![vec![dt; from.board_size as usize]; from.board_size as usize];
 
@@ -100,7 +99,14 @@ impl DrawableBoard {
     for p in from.players() {
       tokens[p.pos.row as usize][p.pos.col as usize].piece = p.team;
     }
-    DrawableBoard { board: tokens }
+    DrawableBoard {
+      board: tokens,
+      mouse: Pos { row: 0, col: 0 },
+      selected_piece: None,
+      selected_move: None,
+    }
+  }
+
   }
 }
 
