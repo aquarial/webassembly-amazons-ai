@@ -112,14 +112,14 @@ const MAX_NUM_PLAYERS: usize = 4;
 
 /// Game state at an instant.
 #[derive(Clone, Debug)]
-pub struct Board {
+pub struct CompactBoard {
   walls: BitVec,
   pub board_size: i8,
   players_array: [Player; MAX_NUM_PLAYERS],
 }
 
-impl Board {
-  pub fn new(board_size: i8, players: Vec<Player>) -> Board {
+impl CompactBoard {
+  pub fn new(board_size: i8, players: Vec<Player>) -> CompactBoard {
     let mut b = BitVec::new_fill(false, (board_size * board_size) as u64);
 
     for r in 0..board_size {
@@ -141,7 +141,7 @@ impl Board {
       pa[pi] = p;
     }
 
-    return Board {
+    return CompactBoard {
       walls: b,
       board_size: board_size,
       players_array: pa,
@@ -235,7 +235,7 @@ impl Board {
   }
 }
 
-pub fn evaluate_by_queen_bfs_distance(board: &Board, team: Team, dist_state: &mut DistState) -> i64 {
+pub fn evaluate_by_queen_bfs_distance(board: &CompactBoard, team: Team, dist_state: &mut DistState) -> i64 {
   bfs(board, team, &mut dist_state.next, &mut dist_state.left);
   bfs(board, team.other(), &mut dist_state.next, &mut dist_state.right);
 
@@ -261,7 +261,7 @@ pub fn evaluate_by_queen_bfs_distance(board: &Board, team: Team, dist_state: &mu
   return score;
 }
 
-fn bfs(board: &Board, team: Team, next: &mut VecDeque<(Pos, u8)>, distances: &mut Vec<u8>) {
+fn bfs(board: &CompactBoard, team: Team, next: &mut VecDeque<(Pos, u8)>, distances: &mut Vec<u8>) {
   for i in 0..distances.len() {
     distances[i] = u8::max_value();
   }
@@ -291,7 +291,7 @@ const QUEEN_DIRS: [(i8,i8); 8] = [(-1,-1),(-1,0),(-1,1),
                                   ( 1,-1),( 1,0),( 1,1)];
 
 
-fn queen_range<'a>(board: &'a Board, from: Pos, blank: Pos) -> impl Iterator<Item = Pos> + 'a {
+fn queen_range<'a>(board: &'a CompactBoard, from: Pos, blank: Pos) -> impl Iterator<Item = Pos> + 'a {
   QUEEN_DIRS.iter().flat_map(move |dir| {
     (1..)
       .map(move |dist| from.with_offset(*dir, dist))

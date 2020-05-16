@@ -1,7 +1,7 @@
 use crate::board::*;
 use smallvec::SmallVec;
 
-pub fn min_max(cache: &mut DistState, board: &Board, team: Team, depth: i32) -> (Option<CompactMove>, i64) {
+pub fn min_max(cache: &mut DistState, board: &CompactBoard, team: Team, depth: i32) -> (Option<CompactMove>, i64) {
   let mut local_board = board.clone();
 
   if depth <= 1 {

@@ -4,20 +4,20 @@ pub mod board;
 use board::*;
 
 enum HistoryMove {
-  NewGame(Board),
+  NewGame(CompactBoard),
   Move(CompactMove),
 }
 
 /// Data structures for amazon simulation,
 /// history-tracking, and AI.
 pub struct Amazons {
-  current: Board,
+  current: CompactBoard,
   history: Vec<HistoryMove>,
   cache: DistState,
 }
 
 impl Amazons {
-  pub fn from_board(board: Board) -> Amazons {
+  pub fn from_board(board: CompactBoard) -> Amazons {
     Amazons {
       current: board.clone(),
       history: vec![HistoryMove::NewGame(board)],
@@ -39,7 +39,7 @@ impl Amazons {
   }
 
   /// Reference to current board
-  pub fn current(&self) -> &Board {
+  pub fn current(&self) -> &CompactBoard {
     &self.current()
   }
 
@@ -120,7 +120,7 @@ mod tests {
 
   #[test]
   fn ai_move() {
-    let b = Board::new(6, vec![
+    let b = CompactBoard::new(6, vec![
       Player{pos:Pos{row:1,col:1},team:Team::Red},
       Player{pos:Pos{row:2,col:2},team:Team::Blue},
     ]);

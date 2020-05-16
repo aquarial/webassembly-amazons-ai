@@ -36,7 +36,7 @@ impl State {
     players.push(Player{ team:Team::Red, pos:Pos {row:  2, col:  4} });
     players.push(Player{ team:Team::Blue, pos:Pos {row:  4, col:  2} });
     players.push(Player{ team:Team::Blue, pos:Pos {row:  4, col:  4} });
-    let amazons = Amazons::from_board(Board::new(board_size, players));
+    let amazons = Amazons::from_board(CompactBoard::new(board_size, players));
 
     let drawboard = DrawState::new(amazons.current());
 
@@ -100,7 +100,7 @@ pub struct DrawState {
 }
 
 impl DrawState {
-  pub fn new(from: &Board) -> DrawState {
+  pub fn new(from: &CompactBoard) -> DrawState {
     let dt = Token::Empty;
     let mut tokens = vec![vec![dt; from.board_size as usize]; from.board_size as usize];
 
@@ -215,7 +215,7 @@ pub fn compute_ai_move(rb: &RequestedBoard) -> ReturnedMove {
   for &(y,x) in &rb.red_team {
     players.push(Player{ team:Team::Red, pos:Pos {row:  y as i8, col:  x as i8} });
   }
-  let mut board = Board::new(rb.size as i8 + 2, players);
+  let mut board = CompactBoard::new(rb.size as i8 + 2, players);
   for &(y,x) in &rb.blocks {
     board.wall_set(Pos {row:y as i8,col:x as i8}, true);
   }
