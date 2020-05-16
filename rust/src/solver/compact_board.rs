@@ -48,32 +48,39 @@ pub struct CompactBoard {
 }
 
 impl CompactBoard {
-  pub fn new(board_size: i8, players: Vec<Player>) -> CompactBoard {
+  pub fn new(board: &Board) -> CompactBoard {
+    let board_size = board.size();
+
     let mut b = BitVec::new_fill(false, (board_size * board_size) as u64);
+
+    let mut players = [Player { pos: Pos {row:0, col:0}, team: Team::Red }; MAX_NUM_PLAYERS];
+    let mut player_ix = 0;
 
     for r in 0..board_size {
       for c in 0..board_size {
-        if r == 0 || c == 0 || r == board_size - 1 || c == board_size - 1 {
-          b.set((r * board_size + c) as u64, true);
+        match board.board[r][c] {
+          BoardSlot::Empty => {}
+          BoardSlot::Wall => {
+            b.set((r * c) as u64, true);
+          }
+          BoardSlot::Piece(team) => {
+            assert!(player_ix < MAX_NUM_PLAYERS);
+            assert!(r != 0 || c != 0);
+
+            players[player_ix].pos.row = r as i8;
+            players[player_ix].pos.col = c as i8;
+            players[player_ix].team = team;
+            player_ix += 1;
+            b.set((r * c) as u64, true);
+          }
         }
       }
     }
-    for p in &players {
-      b.set(p.pos.to_linear(board_size) as u64, true);
-    }
 
-    assert!(players.len() <= MAX_NUM_PLAYERS);
-    assert!(players.len() >= 1);
-    let mut pa = [Player { pos: Pos {row:0, col:0}, team: Team::Red }; MAX_NUM_PLAYERS];
-    for (pi, p) in players.into_iter().enumerate() {
-      assert!(p.pos != Pos { row: 0, col: 0 });
-      pa[pi] = p;
-    }
-
-    return CompactBoard {
+     return CompactBoard {
       walls: b,
-      board_size: board_size,
-      players_array: pa,
+      board_size: board_size as i8,
+      players_array: players,
     };
   }
 
