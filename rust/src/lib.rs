@@ -79,6 +79,7 @@ impl State {
 pub struct DrawableToken {
   pub wall: bool,
   pub piece: Team,
+  pub hover: bool,
 }
 
 #[wasm_bindgen]
@@ -86,8 +87,6 @@ pub struct DrawableToken {
 pub struct DrawableBoard {
   board: Vec<Vec<DrawableToken>>,
   mouse: Pos,
-  selected_piece: Option<Pos>,
-  selected_move: Option<Pos>,
 }
 
 impl DrawableBoard {
@@ -95,6 +94,7 @@ impl DrawableBoard {
     let dt = DrawableToken {
       wall: false,
       piece: Team::Red,
+      hover: false,
     };
     let mut tokens = vec![vec![dt; from.board_size as usize]; from.board_size as usize];
 
@@ -111,8 +111,6 @@ impl DrawableBoard {
     DrawableBoard {
       board: tokens,
       mouse: Pos { row: 0, col: 0 },
-      selected_piece: None,
-      selected_move: None,
     }
   }
 
