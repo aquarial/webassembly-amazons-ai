@@ -82,13 +82,12 @@ pub struct Player {
 }
 
 /// 3 positions that represent how the piece moves
-#[derive(Clone, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Move {
   pub old_pos: Pos,
   pub new_pos: Pos,
   pub new_shot: Pos,
 }
-
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum BoardSlot {
@@ -99,7 +98,7 @@ pub enum BoardSlot {
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Board {
-  board: Vec<Vec<BoardSlot>>,
+  pub board: Vec<Vec<BoardSlot>>,
 }
 
 impl Board {
