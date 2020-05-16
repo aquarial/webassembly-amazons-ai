@@ -1,8 +1,7 @@
+use crate::board::*;
+
 use bv::BitVec;
 use std::collections::VecDeque;
-use wasm_bindgen::prelude::*;
-
-
 
 /// Player and what they do.
 #[derive(Clone, Debug)]
@@ -11,6 +10,15 @@ pub struct CompactMove {
   pub old_pos: Pos,
   pub new_pos: Pos,
   pub new_shot: Pos,
+}
+impl From<CompactMove> for Move {
+  fn from(cm: CompactMove) -> Move {
+    Move {
+      old_pos: cm.old_pos,
+      new_pos: cm.new_pos,
+      new_shot: cm.new_shot,
+    }
+  }
 }
 
 #[derive(Clone, Debug)]
