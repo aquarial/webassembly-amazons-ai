@@ -1,4 +1,5 @@
 use crate::board::*;
+use crate::compact_board::*;
 use smallvec::SmallVec;
 
 pub fn min_max(cache: &mut DistState, board: &CompactBoard, team: Team, depth: i32) -> (Option<CompactMove>, i64) {
