@@ -23,7 +23,7 @@ extern "C" {
 #[wasm_bindgen]
 pub struct State {
   gamestate: Amazons,
-  drawstate: DrawableBoard,
+  drawstate: DrawState,
   turn: Team,
 }
 
@@ -38,7 +38,7 @@ impl State {
     players.push(Player{ team:Team::Blue, pos:Pos {row:  4, col:  4} });
     let amazons = Amazons::from_board(Board::new(board_size, players));
 
-    let drawboard = DrawableBoard::new(amazons.current());
+    let drawboard = DrawState::new(amazons.current());
 
     State {
       turn: Team::Red,
@@ -70,7 +70,8 @@ impl State {
       log(&format!("State.token({}, {}) out of [1, {}) range!",
         row, col, self.size()));
     }
-    self.drawstate.board[row as usize][col as usize]
+    unimplemented!();
+   // self.drawstate.board[row as usize][col as usize]
   }
 }
 
@@ -82,35 +83,42 @@ pub struct DrawableToken {
   pub hover: bool,
 }
 
-#[wasm_bindgen]
+
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub struct DrawableBoard {
-  board: Vec<Vec<DrawableToken>>,
-  mouse: Pos,
+pub enum Token {
+  Empty,
+  Wall,
+  Piece(Team),
 }
 
-impl DrawableBoard {
-  pub fn new(from: &Board) -> DrawableBoard {
-    let dt = DrawableToken {
-      wall: false,
-      piece: Team::Red,
-      hover: false,
-    };
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct DrawState {
+  board: Vec<Vec<Token>>,
+  mouse: Pos,
+  selected_piece: Option<Pos>,
+  selected_move: Option<Pos>,
+}
+
+impl DrawState {
+  pub fn new(from: &Board) -> DrawState {
+    let dt = Token::Empty;
     let mut tokens = vec![vec![dt; from.board_size as usize]; from.board_size as usize];
 
     for r in 0..from.board_size {
       for c in 0..from.board_size {
         if from.wall_at(Pos { row: r, col: c }) {
-          tokens[r as usize][c as usize].wall = true;
+          tokens[r as usize][c as usize] = Token::Wall;
         }
       }
     }
     for p in from.players() {
-      tokens[p.pos.row as usize][p.pos.col as usize].piece = p.team;
+      tokens[p.pos.row as usize][p.pos.col as usize] = Token::Piece(p.team);
     }
-    DrawableBoard {
+    DrawState {
       board: tokens,
       mouse: Pos { row: 0, col: 0 },
+      selected_piece: None,
+      selected_move: None,
     }
   }
 
