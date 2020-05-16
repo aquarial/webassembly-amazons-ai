@@ -103,7 +103,7 @@ pub struct Board {
 }
 
 impl Board {
-  pub fn new(board_size: i8, players: Vec<Player>) -> Self {
+  pub fn new() -> Self {
     let board_size = 8 + 2; // 8x8 with walls
     let mut tokens = vec![vec![BoardSlot::Empty; board_size]; board_size];
 
@@ -145,12 +145,12 @@ impl Board {
     &mut self.board[pos.row as usize][pos.col as usize]
   }
 
-  pub fn apply_move(&mut self, mv: &Move) {
+  pub fn apply_move(&mut self, mv: Move) {
     *self.at(mv.new_shot) = BoardSlot::Wall;
     std::mem::swap(self.at(mv.old_pos), self.at(mv.new_pos));
   }
 
-  pub fn un_apply_move(&mut self, mv: &Move) {
+  pub fn un_apply_move(&mut self, mv: Move) {
     *self.at(mv.new_shot) = BoardSlot::Empty;
     std::mem::swap(self.at(mv.old_pos), self.at(mv.new_pos));
   }
