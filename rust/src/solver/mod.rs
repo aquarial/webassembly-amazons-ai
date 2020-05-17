@@ -42,8 +42,8 @@ impl Amazons {
   }
 
   /// Reference to current board
-  pub fn current(&self) -> &CompactBoard {
-    &self.current()
+  pub fn current(&self) -> &Board {
+    &self.current
   }
 
   /// Try to record a player's move
@@ -52,7 +52,6 @@ impl Amazons {
   pub fn player_move(&mut self, mv: Move) {
     self.current.apply_move(mv);
     self.history.push(HistoryMove::Move(mv));
-    self.history.truncate(100);
   }
 
   /// Compute and make a move for an AI team.
@@ -61,11 +60,10 @@ impl Amazons {
   pub fn ai_move(&mut self, team: Team) -> Option<CompactMove> {
     // TODO Multi-threading based on # of caches
     let cache = &mut self.cache;
-    return match algo::min_max(cache, &self.current, team, 3) {
+    return match algo::min_max(cache, &CompactBoard::new(&self.current), team, 3) {
       (Some(m_move), _) => {
-        self.current.apply_move(&m_move);
-        self.history.push(HistoryMove::Move(m_move.clone()));
-        self.history.truncate(100);
+        self.current.apply_move(m_move.clone().into());
+        self.history.push(HistoryMove::Move(m_move.clone().into()));
         Some(m_move)
       }
       (None, _) => None,
