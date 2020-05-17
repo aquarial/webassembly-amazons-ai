@@ -13,15 +13,18 @@ enum HistoryMove {
 /// Data structures for amazon simulation,
 /// history-tracking, and AI.
 pub struct Amazons {
-  current: Board,
+  pub turn: Team,
+  pub current: Board,
   history: Vec<HistoryMove>,
   cache: DistState,
 }
 
 impl Amazons {
+  
   pub fn new() -> Amazons {
     let b = Board::new();
     Amazons {
+      turn: Team::Red,
       current: b.clone(),
       history: vec![HistoryMove::NewGame(b)],
       cache: DistState::new(),
@@ -39,11 +42,6 @@ impl Amazons {
       }
       None => {}
     }
-  }
-
-  /// Reference to current board
-  pub fn current(&self) -> &Board {
-    &self.current
   }
 
   /// Try to record a player's move

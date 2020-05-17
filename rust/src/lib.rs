@@ -24,17 +24,23 @@ extern "C" {
 pub struct State {
   gamestate: Amazons,
   drawstate: DrawState,
-  turn: Team,
 }
 
 #[wasm_bindgen]
 impl State {
   pub fn new() -> State {
     State {
-      turn: Team::Red,
       gamestate: Amazons::new(),
       drawstate: DrawState::new(),
     }
+  }
+
+  pub fn turn(&self) -> Team {
+    self.gamestate.turn
+  }
+
+  pub fn size(&self) -> usize {
+    self.gamestate.current.size()
   }
 
   pub fn mouse_move(&self, row: f64, col: f64) {
@@ -44,14 +50,6 @@ impl State {
         row, col, self.size()));
     }
     self.drawstate.mouse_move(row as usize, col as usize);
-  }
-
-  pub fn turn(&self) -> Team {
-    self.turn
-  }
-
-  pub fn size(&self) -> usize {
-    self.gamestate.current().size()
   }
 
   pub fn token(&self, row: f64, col: f64) -> DrawableToken {
