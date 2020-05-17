@@ -22,13 +22,18 @@ pub struct Amazons {
 impl Amazons {
   
   pub fn new() -> Amazons {
-    let b = Board::new();
     Amazons {
       turn: Team::Red,
-      current: b.clone(),
-      history: vec![HistoryMove::NewGame(b)],
+      current: Board::new(),
+      history: vec![],
       cache: DistState::new(),
     }
+  }
+
+  pub fn new_game(&mut self) {
+    self.turn = Team::Red;
+    self.current = Board::new();
+    self.history.push(HistoryMove::NewGame(self.current.clone()));
   }
 
   /// Revert the last move.
