@@ -30,20 +30,10 @@ pub struct State {
 #[wasm_bindgen]
 impl State {
   pub fn new() -> State {
-    let board_size = 8 + 2;
-    let mut players = Vec::new();
-    players.push(Player{ team:Team::Red, pos:Pos {row:  2, col:  2} });
-    players.push(Player{ team:Team::Red, pos:Pos {row:  2, col:  4} });
-    players.push(Player{ team:Team::Blue, pos:Pos {row:  4, col:  2} });
-    players.push(Player{ team:Team::Blue, pos:Pos {row:  4, col:  4} });
-    let amazons = Amazons::from_board(CompactBoard::new(board_size, players));
-
-    let drawboard = DrawState::new(amazons.current());
-
     State {
       turn: Team::Red,
-      gamestate: amazons,
-      drawstate: drawboard,
+      gamestate: Amazons::new(),
+      drawstate: DrawState::new(),
     }
   }
 
@@ -60,8 +50,8 @@ impl State {
     self.turn
   }
 
-  pub fn size(&self) -> i8 {
-    self.gamestate.current().board_size - 2
+  pub fn size(&self) -> usize {
+    self.gamestate.current().size()
   }
 
   pub fn token(&self, row: f64, col: f64) -> DrawableToken {
