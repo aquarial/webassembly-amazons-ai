@@ -55,14 +55,16 @@ impl Amazons {
   /// Compute and make a move for an AI team.
   ///
   /// Return false if the AI gives up.
-  pub fn ai_move(&mut self, team: Team) -> Option<CompactMove> {
+  pub fn ai_move(&mut self) -> Option<Move> {
     // TODO Multi-threading based on # of caches
     let cache = &mut self.cache;
-    return match algo::min_max(cache, &CompactBoard::new(&self.current), team, 3) {
-      (Some(m_move), _) => {
-        self.current.apply_move(m_move.clone().into());
-        self.history.push(HistoryMove::Move(m_move.clone().into()));
-        Some(m_move)
+    return match algo::min_max(cache, &CompactBoard::new(&self.current), self.turn, 3) {
+      (Some(compact_move), _) => {
+        self.turn = self.turn.other();
+        let m: Move = compact_move.into();
+        self.current.apply_move(m.clone());
+        self.history.push(HistoryMove::Move(m.clone()));
+        Some(m)
       }
       (None, _) => None,
     };

@@ -20,6 +20,7 @@ impl Team {
   }
 }
 
+#[wasm_bindgen]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Pos {
   pub row: i8,
@@ -82,6 +83,7 @@ pub struct Player {
 }
 
 /// 3 positions that represent how the piece moves
+#[wasm_bindgen]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Move {
   pub old_pos: Pos,

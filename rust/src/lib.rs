@@ -43,6 +43,10 @@ impl State {
     self.gamestate.current.size()
   }
 
+  pub fn ai_move(&mut self) -> Option<Move> {
+    self.gamestate.ai_move()
+  }
+
   pub fn mouse_move(&self, row: f64, col: f64) {
     if !is_int_in_range(row, (1.0, self.size() as f64))
       || !is_int_in_range(col, (1.0, self.size() as f64)) {
