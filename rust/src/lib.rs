@@ -73,39 +73,16 @@ pub struct DrawableToken {
   pub hover: bool,
 }
 
-
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub enum Token {
-  Empty,
-  Wall,
-  Piece(Team),
-}
-
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct DrawState {
-  board: Vec<Vec<Token>>,
   mouse: Pos,
   selected_piece: Option<Pos>,
   selected_move: Option<Pos>,
 }
 
 impl DrawState {
-  pub fn new(from: &CompactBoard) -> DrawState {
-    let dt = Token::Empty;
-    let mut tokens = vec![vec![dt; from.board_size as usize]; from.board_size as usize];
-
-    for r in 0..from.board_size {
-      for c in 0..from.board_size {
-        if from.wall_at(Pos { row: r, col: c }) {
-          tokens[r as usize][c as usize] = Token::Wall;
-        }
-      }
-    }
-    for p in from.players() {
-      tokens[p.pos.row as usize][p.pos.col as usize] = Token::Piece(p.team);
-    }
+  pub fn new() -> DrawState {
     DrawState {
-      board: tokens,
       mouse: Pos { row: 0, col: 0 },
       selected_piece: None,
       selected_move: None,
