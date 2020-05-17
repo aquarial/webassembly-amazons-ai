@@ -47,10 +47,18 @@ impl State {
     self.gamestate.ai_move()
   }
 
+  pub fn mouse_click(&mut self, row: f64, col: f64) {
+    if !is_int_in_range(row, (1.0, self.size() as f64))
+    || !is_int_in_range(col, (1.0, self.size() as f64)) {
+    log(&format!("State.mouse_click({}, {}) out of [1, {}) range!",
+      row, col, self.size()));
+    }
+  }
+
   pub fn mouse_move(&self, row: f64, col: f64) {
     if !is_int_in_range(row, (1.0, self.size() as f64))
       || !is_int_in_range(col, (1.0, self.size() as f64)) {
-      log(&format!("State.mouse_move({}, {}) out of (0, {}) range!",
+      log(&format!("State.mouse_move({}, {}) out of [1, {}) range!",
         row, col, self.size()));
     }
     self.drawstate.mouse_move(row as usize, col as usize);
