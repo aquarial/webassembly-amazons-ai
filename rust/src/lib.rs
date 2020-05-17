@@ -35,16 +35,31 @@ impl State {
     }
   }
 
-  pub fn turn(&self) -> Team {
-    self.gamestate.turn
+  pub fn turn(&self) -> DrawableTeam {
+    self.gamestate.turn.into()
   }
 
   pub fn size(&self) -> usize {
     self.gamestate.current.size()
   }
 
-  pub fn ai_move(&mut self) -> Option<Move> {
-    self.gamestate.ai_move()
+  pub fn new_game(&mut self) { 
+    self.drawstate.clear_selected();
+    self.gamestate.new_game();
+  }
+
+  pub fn ai_move(&mut self) {
+    self.drawstate.clear_selected();
+    self.gamestate.ai_move();
+  }
+
+  pub fn undo(&mut self) {
+    self.gamestate.undo_move();
+    self.drawstate.clear_selected();
+  }
+
+  pub fn mouse_leave(&mut self) {
+    self.drawstate.mouse_leave();
   }
 
   pub fn mouse_click(&mut self, row: f64, col: f64) {
@@ -53,6 +68,58 @@ impl State {
     log(&format!("State.mouse_click({}, {}) out of [1, {}) range!",
       row, col, self.size()));
     }
+    /*
+
+    let at = gameboard.atPos(tpos);
+    if (at instanceof Player) {
+      if (at === drawstate.piece) {
+        if (drawstate.move != null) {
+          // placing a stone on the location of the moving piece
+          gamestate.addMove(drawstate.piece, drawstate.move, tpos)
+          gameboard.makePlayerMove(drawstate.piece, drawstate.move, tpos)
+          drawstate.piece = null
+          drawstate.move = null;
+        } else {
+          // re-click to deselect
+          drawstate.piece = null
+        }
+      } else {
+        drawstate.piece = null;
+        if (at.team === gamestate.next_to_go) {
+          drawstate.piece = at;
+        }
+        drawstate.move = null;
+      }
+    } else if (at != null) {
+      drawstate.piece = null;
+      drawstate.move = null;
+    }
+
+    if (at == undefined) {
+      if (drawstate.piece == null) { // select piece
+        // make pieces flash
+      } else if (drawstate.move == null) { // move pieces
+        if (gameboard.openLineTo(drawstate.piece, tpos)) {
+          drawstate.move = tpos;
+        } else {
+          drawstate.piece = null;
+        }
+      } else { // place stone
+        gameboard.blocked.set(drawstate.piece.pos.str(), undefined);
+        if (gameboard.openLineTo(drawstate.move, tpos)) {
+          gameboard.blocked.set(drawstate.piece.pos.str(), drawstate.piece);
+          gamestate.addMove(drawstate.piece, drawstate.move, tpos)
+          gameboard.makePlayerMove(drawstate.piece, drawstate.move, tpos)
+          drawstate.piece = null;
+          drawstate.move = null;
+        } else {
+          gameboard.blocked.set(drawstate.piece.pos.str(), drawstate.piece);
+          drawstate.piece = null;
+          drawstate.move = null;
+        }
+      }
+    }
+*/
   }
 
   pub fn mouse_move(&self, row: f64, col: f64) {
@@ -62,6 +129,7 @@ impl State {
         row, col, self.size()));
     }
     self.drawstate.mouse_move(row as usize, col as usize);
+    unimplemented!();
   }
 
   pub fn token(&self, row: f64, col: f64) -> DrawableToken {
@@ -75,11 +143,26 @@ impl State {
   }
 }
 
+
 #[wasm_bindgen]
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug)]
+pub enum DrawableTeam {
+  Red, Blue,
+}
+impl From<Team> for DrawableTeam {
+  fn from(t: Team) -> DrawableTeam {
+    match t {
+      Team::Red => DrawableTeam::Red,
+      Team::Blue => DrawableTeam::Blue,
+    }
+  }
+}
+
+#[wasm_bindgen]
+#[derive(Clone, Copy, Debug)]
 pub struct DrawableToken {
   pub wall: bool,
-  pub piece: Team,
+  pub piece: DrawableTeam,
   pub hover: bool,
 }
 
@@ -99,10 +182,21 @@ impl DrawState {
     }
   }
 
+  pub fn mouse_leave(&mut self) {
+    self.clear_selected();
+    self.mouse = Pos { row: -1, col: -1 };
+  }
+
+  pub fn clear_selected(&mut self) {
+    self.selected_piece = None;
+    self.selected_move = None;
+  }
+
   pub fn mouse_move(&self, row: usize, col: usize) {
     if row == self.mouse.row as usize && col == self.mouse.col as usize {
       return;
     }
+    unimplemented!();
   }
 }
 
@@ -172,16 +266,6 @@ fn is_int_in_range(val: f64, range: (f64, f64)) -> bool {
 
 //     return true;
 //   }
-// }
-
-// #[wasm_bindgen]
-// pub struct ReturnedMove {
-//   pub piece_y: i8,
-//   pub piece_x: i8,
-//   pub move_y: i8,
-//   pub move_x: i8,
-//   pub stone_y: i8,
-//   pub stone_x: i8,
 // }
 
 // #[wasm_bindgen]
