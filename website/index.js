@@ -3,7 +3,7 @@
 
 import * as wasm from "amazons-ai-webassembly";
 import { GameBoard, Player, GameState, Pos } from "./game.js";
-import { DrawState } from "./drawstate.js";
+import { drawWasmTiles } from "./drawstate.js";
 
 /** @type {((dt: number, totaltime: number) => void)[]} */
 let animations = [];
@@ -17,159 +17,53 @@ let animations = [];
   let next2go = (document.getElementById("next2go"));
   let next2go_2d = next2go.getContext("2d");
 
-  let gameboard = new GameBoard(8, 8);
-  gameboard.addPlayer(new Player(new Pos(3, 3), "red"));
-  gameboard.addPlayer(new Player(new Pos(3, 6), "red"));
-  gameboard.addPlayer(new Player(new Pos(6, 3), "blue"));
-  gameboard.addPlayer(new Player(new Pos(6, 6), "blue"));
-
-
-  let gamestate = new GameState();
-
-  let drawstate = new DrawState();
+  let state = wasm.State.new();
 
   /** @type {HTMLButtonElement} */
   let undo = (document.getElementById("undo"));
-  undo.onmousedown = function (event) {
-    gamestate.undoMove(gameboard);
-    drawstate.piece = null;
-    drawstate.move = null;
+  undo.onmousedown = function () {
+    state.undo();
   }
   /** @type {HTMLButtonElement} */
   let newgame = (document.getElementById("newgame"));
-  newgame.onmousedown = function (event) {
-    // TODO: allow undoing 'newgame'
-    gamestate = new GameState();
-    drawstate = new DrawState();  
-    gameboard = new GameBoard(8, 8);
-    gameboard.addPlayer(new Player(new Pos(3, 3), "red"));
-    gameboard.addPlayer(new Player(new Pos(3, 6), "red"));
-    gameboard.addPlayer(new Player(new Pos(6, 3), "blue"));
-    gameboard.addPlayer(new Player(new Pos(6, 6), "blue"));  
+  newgame.onmousedown = function () {
+    state.new_game();
   }
   /** @type {HTMLButtonElement} */
   let makeai = (document.getElementById("makeai"));
   makeai.onmousedown = function (event) {
-    let board = wasm.RequestedBoard.new(gameboard.width);
-    for (let y = 1; y <= gameboard.height; y++) {
-      for (let x = 1; x <= gameboard.width; x++) {
-        let at = gameboard.atYX(y, x);
-        if (at instanceof Player) {
-          if (at.team == gamestate.next_to_go) {
-            board.add_red_team(at.pos.y, at.pos.x);
-          } else {
-            board.add_blue_team(at.pos.y, at.pos.x);
-          }
-        } else if (at != undefined) {
-          board.add_block(y, x)
-        }
-      }
-    }
-
-    if (board.is_valid()) {
-      let r = wasm.compute_ai_move(board)
-      console.log(r.piece_y, r.piece_x, r.move_y, r.move_x, r.stone_y, r.stone_x)
-      if (r.piece_y > 0 && r.piece_x > 0 &&
-        r.move_y > 0 && r.move_x > 0 &&
-        r.stone_y > 0 && r.stone_x > 0) {
-        let p0 = gameboard.atPos(new Pos(r.piece_y, r.piece_x))
-        let p1 = new Pos(r.move_y, r.move_x)
-        let p2 = new Pos(r.stone_y, r.stone_x)
-        gamestate.addMove(p0, p1, p2)
-        gameboard.makePlayerMove(p0, p1, p2)
-        drawstate.piece = null
-        drawstate.move = null;
-      }
-      r.free();
-    } else {
-      alert("Error: invalid board??")
-    }
-
-    board.free();
+    state.ai_move();
   }
 
-
   canvas.onmouseleave = function (event) {
-    drawstate.piece = null
-    drawstate.move = null
-    drawstate.mouse_pos.y = -1;
-    drawstate.mouse_pos.x = -1;
+    state.mouse_leave();
   }
 
   // will be used for animations
   canvas.onmousemove = (function (event) {
-    let tilesize = canvas.width / gameboard.width;
-
+    let tilesize = canvas.width / state.size();
     let tx = Math.floor(event.offsetX / tilesize) + 1;
     let ty = Math.floor(event.offsetY / tilesize) + 1;
-    drawstate.mouse_pos.x = tx;
-    drawstate.mouse_pos.y = ty;
+    state.mouse_move(ty, tx);
   })
 
   // click handler
   canvas.onmousedown = function (event) {
-    let tilesize = canvas.width / gameboard.width;
+    let tilesize = canvas.width / state.size();
 
     let tx = Math.floor(event.offsetX / tilesize) + 1;
     let ty = Math.floor(event.offsetY / tilesize) + 1;
-    let tpos = new Pos(ty, tx);
-
-    let at = gameboard.atPos(tpos);
-    if (at instanceof Player) {
-      if (at === drawstate.piece) {
-        if (drawstate.move != null) {
-          // placing a stone on the location of the moving piece
-          gamestate.addMove(drawstate.piece, drawstate.move, tpos)
-          gameboard.makePlayerMove(drawstate.piece, drawstate.move, tpos)
-          drawstate.piece = null
-          drawstate.move = null;
-        } else {
-          // re-click to deselect
-          drawstate.piece = null
-        }
-      } else {
-        drawstate.piece = null;
-        if (at.team === gamestate.next_to_go) {
-          drawstate.piece = at;
-        }
-        drawstate.move = null;
-      }
-    } else if (at != null) {
-      drawstate.piece = null;
-      drawstate.move = null;
-    }
-
-    if (at == undefined) {
-      if (drawstate.piece == null) { // select piece
-        // make pieces flash
-      } else if (drawstate.move == null) { // move pieces
-        if (gameboard.openLineTo(drawstate.piece, tpos)) {
-          drawstate.move = tpos;
-        } else {
-          drawstate.piece = null;
-        }
-      } else { // place stone
-        gameboard.blocked.set(drawstate.piece.pos.str(), undefined);
-        if (gameboard.openLineTo(drawstate.move, tpos)) {
-          gameboard.blocked.set(drawstate.piece.pos.str(), drawstate.piece);
-          gamestate.addMove(drawstate.piece, drawstate.move, tpos)
-          gameboard.makePlayerMove(drawstate.piece, drawstate.move, tpos)
-          drawstate.piece = null;
-          drawstate.move = null;
-        } else {
-          gameboard.blocked.set(drawstate.piece.pos.str(), drawstate.piece);
-          drawstate.piece = null;
-          drawstate.move = null;
-        }
-      }
-    }
-
-
+    state.mouse_click(ty, tx);
   }
+
   animations.push((dt, totaltime) => {
-    next2go_2d.fillStyle = gamestate.next_to_go
+    if (state.turn() == wasm.DrawableTeam.Red)
+      next2go_2d.fillStyle = "red";
+    else 
+      next2go_2d.fillStyle = "blue";
     next2go_2d.fillRect(0, 0, next2go.width, next2go.height)
-    drawstate.drawTiles(c2d, gameboard, canvas.width / gameboard.width)
+
+    drawWasmTiles(c2d, state, canvas.width / state.size());
   })
 }
 
