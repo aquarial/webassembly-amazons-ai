@@ -61,7 +61,7 @@ impl CompactBoard {
         match board.board[r][c] {
           BoardSlot::Empty => {}
           BoardSlot::Wall => {
-            b.set((r * c) as u64, true);
+            b.set((r * board_size + c) as u64, true);
           }
           BoardSlot::Piece(team) => {
             assert!(player_ix < MAX_NUM_PLAYERS);
@@ -71,7 +71,7 @@ impl CompactBoard {
             players[player_ix].pos.col = c as i8;
             players[player_ix].team = team;
             player_ix += 1;
-            b.set((r * c) as u64, true);
+            b.set((r * board_size + c) as u64, true);
           }
         }
       }
