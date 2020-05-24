@@ -23,7 +23,9 @@ extern "C" {
 #[wasm_bindgen]
 pub struct State {
   gamestate: Amazons,
-  drawstate: DrawState,
+  mouse: Pos,
+  selected_piece: Option<Pos>,
+  selected_move: Option<Pos>,
 }
 
 #[wasm_bindgen]
@@ -31,8 +33,15 @@ impl State {
   pub fn new() -> State {
     State {
       gamestate: Amazons::new(),
-      drawstate: DrawState::new(),
+      mouse: Pos { row: 0, col: 0 },
+      selected_piece: None,
+      selected_move: None,
     }
+  }
+
+  fn clear_selected(&mut self) {
+    self.selected_piece = None;
+    self.selected_move = None;
   }
 
   pub fn turn(&self) -> DrawableTeam {
@@ -46,23 +55,23 @@ impl State {
   }
 
   pub fn new_game(&mut self) {
-    self.drawstate.clear_selected();
     self.gamestate.new_game();
     log(&self.gamestate.current.pprint());
   }
 
   pub fn ai_move(&mut self) {
-    self.drawstate.clear_selected();
+    self.clear_selected();
     self.gamestate.ai_move();
   }
 
   pub fn undo(&mut self) {
     self.gamestate.undo_move();
-    self.drawstate.clear_selected();
+    self.clear_selected();
   }
 
   pub fn mouse_leave(&mut self) {
-    self.drawstate.mouse_leave();
+    self.clear_selected();
+    self.mouse = Pos { row: -1, col: -1 };
   }
 
   pub fn mouse_click(&mut self, row: f64, col: f64) {
@@ -72,7 +81,25 @@ impl State {
       row, col, self.size()));
     }
 
-    self.drawstate.mouse_click(row as i8, col as i8);
+    let clicked = Pos { row: row as i8, col: col as i8 };
+
+    match (self.selected_piece, self.selected_move) {
+      (None, _) => {
+        self.selected_piece = Some(clicked);
+      },
+      (_,  None) => {
+        self.selected_move = Some(clicked);
+      },
+      (Some(piece), Some(mv)) => {
+        self.clear_selected();
+        let mv = Move {
+          old_pos: piece,
+          new_pos: mv,
+          new_shot: clicked,
+        };
+      }
+    };
+
     /*
 
     let at = gameboard.atPos(tpos);
@@ -133,7 +160,8 @@ impl State {
       log(&format!("State.mouse_move({}, {}) out of [1, {}) range!",
         row, col, self.size()));
     }
-    self.drawstate.mouse_move(row as i8, col as i8);
+    self.mouse.row = row as i8;
+    self.mouse.col = col as i8;
   }
 
   pub fn token(&self, row: f64, col: f64) -> DrawableToken {
@@ -172,61 +200,6 @@ pub struct DrawableToken {
   pub wall: bool,
   pub hover: bool,
   pub piece: Option<DrawableTeam>,
-}
-
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct DrawState {
-  mouse: Pos,
-  selected_piece: Option<Pos>,
-  selected_move: Option<Pos>,
-}
-
-impl DrawState {
-  pub fn new() -> DrawState {
-    DrawState {
-      mouse: Pos { row: 0, col: 0 },
-      selected_piece: None,
-      selected_move: None,
-    }
-  }
-
-  pub fn mouse_leave(&mut self) {
-    self.clear_selected();
-    self.mouse = Pos { row: -1, col: -1 };
-  }
-
-  pub fn clear_selected(&mut self) {
-    self.selected_piece = None;
-    self.selected_move = None;
-  }
-
-  pub fn mouse_move(&mut self, row: i8, col: i8) {
-    self.mouse.row = row;
-    self.mouse.col = col;
-  }
-
-  pub fn mouse_click(&mut self, row: i8, col: i8) -> Option<Move> {
-    let clicked = Pos { row: row, col: col };
-
-    match (self.selected_piece, self.selected_move) {
-      (None, _) => {
-        self.selected_piece = Some(clicked);
-        self.selected_move = None;
-      },
-      (_,  None) => {
-        self.selected_move = Some(clicked);
-      },
-      (Some(piece), Some(mv)) => {
-        self.clear_selected();
-        return Some(Move {
-          old_pos: piece,
-          new_pos: mv,
-          new_shot: clicked,
-        });
-      }
-    };
-    return None;
-  }
 }
 
 
