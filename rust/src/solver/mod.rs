@@ -53,6 +53,7 @@ impl Amazons {
   ///
   /// Return Err(msg) explaining the error if the move is invalid.
   pub fn player_move(&mut self, mv: Move) {
+    self.turn = self.turn.other();
     self.current.apply_move(mv);
     self.history.push(HistoryMove::Move(mv));
   }

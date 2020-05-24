@@ -139,7 +139,15 @@ impl Board {
     self.board.len().max(self.board.iter().map(|r| r.len()).max().unwrap())
   }
 
-  fn at(&mut self, pos: Pos) -> &mut BoardSlot {
+  pub fn open_line_along(&mut self, start: Pos, end: Pos) -> bool {
+    if !start.in_a_line_with(end) { return false; };
+    if start == end { return false; }
+    return start
+      .along_line(end).into_iter()
+      .all(|p| *self.at(p) == BoardSlot::Empty)
+  }
+
+  pub fn at(&mut self, pos: Pos) -> &mut BoardSlot {
     &mut self.board[pos.row as usize][pos.col as usize]
   }
 
