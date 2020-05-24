@@ -1,4 +1,3 @@
-
 /// Red or Blue.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum Team {
@@ -117,9 +116,7 @@ impl Board {
     tokens[6][3] = BoardSlot::Piece(Team::Blue);
     tokens[6][6] = BoardSlot::Piece(Team::Blue);
 
-    return Board {
-      board: tokens,  
-    };
+    return Board { board: tokens };
   }
 
   pub fn pprint(&self) -> String {

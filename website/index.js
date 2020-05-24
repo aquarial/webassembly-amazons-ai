@@ -59,7 +59,7 @@ let animations = [];
   animations.push((dt, totaltime) => {
     if (state.turn() == wasm.DrawableTeam.Red)
       next2go_2d.fillStyle = "red";
-    else 
+    else
       next2go_2d.fillStyle = "blue";
     next2go_2d.fillRect(0, 0, next2go.width, next2go.height)
 

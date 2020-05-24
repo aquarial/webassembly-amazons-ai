@@ -45,7 +45,7 @@ impl State {
     self.gamestate.current.size() - 2
   }
 
-  pub fn new_game(&mut self) { 
+  pub fn new_game(&mut self) {
     self.drawstate.clear_selected();
     self.gamestate.new_game();
     log(&self.gamestate.current.pprint());

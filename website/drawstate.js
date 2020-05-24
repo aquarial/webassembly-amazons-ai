@@ -5,11 +5,11 @@ import { Player, Pos, GameBoard } from "./game";
 import * as wasm from "amazons-ai-webassembly";
 
 
-  /**
-   * @param {CanvasRenderingContext2D} c2d
-   * @param {wasm.State} state
-   * @param {number} tilesize
-   */
+/**
+ * @param {CanvasRenderingContext2D} c2d
+ * @param {wasm.State} state
+ * @param {number} tilesize
+ */
 export function drawWasmTiles(c2d, state, tilesize) {
   let checker_colors = ["#eae8ea", "#c1c1c1"]
 
@@ -27,9 +27,9 @@ export function drawWasmTiles(c2d, state, tilesize) {
 
       if (at.piece != null) {
         if (at.piece == wasm.DrawableTeam.Red) {
-            c2d.fillStyle = team_color('red', at.hover);
+          c2d.fillStyle = team_color('red', at.hover);
         } else {
-           c2d.fillStyle = team_color('blue', at.hover);
+          c2d.fillStyle = team_color('blue', at.hover);
         }
         drawOneShape(c2d, tilesize, y, x, "circle")
       }
@@ -40,70 +40,70 @@ export function drawWasmTiles(c2d, state, tilesize) {
 }
 
 
-  /**
-   * @param {CanvasRenderingContext2D} c2d
-   * @param {number} tilesize
-   * @param {number} y
-   * @param {number} x
-   * @param {String} style
-   */
-function  drawOneShape(c2d, tilesize, y, x, style) {
-    switch (style) {
-      case "circle":
-        c2d.beginPath();
-        c2d.ellipse((x - 1 + 0.5) * tilesize, (y - 1 + 0.5) * tilesize,
-          (tilesize) * 0.3, (tilesize) * 0.3, 0, 0, 360);
-        c2d.fill();
-        break;
-      case "circle outline":
-        c2d.beginPath();
-        c2d.ellipse((x - 1 + 0.5) * tilesize, (y - 1 + 0.5) * tilesize,
-          (tilesize * 1.1) * 0.3, (tilesize * 1.1) * 0.3, 0, 0, 360);
-        c2d.fill();
-        break;
-      case "block":
-        c2d.fillRect((x - 1 + 0.2) * tilesize, (y - 1 + 0.2) * tilesize, tilesize * 0.6, tilesize * 0.6)
-        break;
+/**
+ * @param {CanvasRenderingContext2D} c2d
+ * @param {number} tilesize
+ * @param {number} y
+ * @param {number} x
+ * @param {String} style
+ */
+function drawOneShape(c2d, tilesize, y, x, style) {
+  switch (style) {
+    case "circle":
+      c2d.beginPath();
+      c2d.ellipse((x - 1 + 0.5) * tilesize, (y - 1 + 0.5) * tilesize,
+        (tilesize) * 0.3, (tilesize) * 0.3, 0, 0, 360);
+      c2d.fill();
+      break;
+    case "circle outline":
+      c2d.beginPath();
+      c2d.ellipse((x - 1 + 0.5) * tilesize, (y - 1 + 0.5) * tilesize,
+        (tilesize * 1.1) * 0.3, (tilesize * 1.1) * 0.3, 0, 0, 360);
+      c2d.fill();
+      break;
+    case "block":
+      c2d.fillRect((x - 1 + 0.2) * tilesize, (y - 1 + 0.2) * tilesize, tilesize * 0.6, tilesize * 0.6)
+      break;
+  }
+}
+
+/**
+ * @param {string} team_name
+ */
+function team_color(team_name, faded = false) {
+  if (team_name == "deselected") {
+    return "#30303055"
+  }
+  if (team_name == "block") {
+    if (faded) {
+      return '#30303066'
+    } else {
+      return '#303030'
+    }
+  }
+  if (team_name == "red") {
+    if (faded) {
+      return "#ff000066"
+    } else {
+      return "#ff0000"
     }
   }
 
-  /**
-   * @param {string} team_name
-   */
-  function team_color(team_name, faded=false) {
-    if (team_name == "deselected") {
-      return "#30303055"
+  if (team_name == "blue") {
+    if (faded) {
+      return "#0000ff66"
+    } else {
+      return "#0000ff"
     }
-    if (team_name == "block") {
-      if (faded) {
-        return '#30303066'
-      } else {
-        return '#303030'
-      }
-    }
-    if (team_name == "red") {
-      if (faded) {
-        return "#ff000066"
-      } else {
-        return "#ff0000"
-      }
-    }
-
-    if (team_name == "blue") {
-      if (faded) {
-        return "#0000ff66"
-      } else {
-        return "#0000ff"
-      }
-    }
-    throw new Error("Unkown team: " + team_name)
   }
+  throw new Error("Unkown team: " + team_name)
+}
 
 
 
 export class DrawState {
   constructor() {
-    this.mouse_pos = new Pos(-1,-1);
+    this.mouse_pos = new Pos(-1, -1);
 
     /** @type {Player} */
     this.piece = null

@@ -20,7 +20,7 @@ pub struct Amazons {
 }
 
 impl Amazons {
-  
+
   pub fn new() -> Amazons {
     Amazons {
       turn: Team::Red,
