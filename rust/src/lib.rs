@@ -129,7 +129,7 @@ impl State {
         row, col, self.size()));
     }
     self.drawstate.mouse_move(row as usize, col as usize);
-    unimplemented!();
+    // unimplemented!();
   }
 
   pub fn token(&self, row: f64, col: f64) -> DrawableToken {
@@ -138,8 +138,14 @@ impl State {
       log(&format!("State.token({}, {}) out of [1, {}) range!",
         row, col, self.size()));
     }
-    unimplemented!();
-   // self.drawstate.board[row as usize][col as usize]
+
+    // unimplemented!();
+    // self.drawstate.board[row as usize][col as usize]
+    match self.gamestate.current.board[row as usize][col as usize] {
+      BoardSlot::Empty => DrawableToken { wall: false, hover: false, piece: None },
+      BoardSlot::Wall => DrawableToken { wall: true, hover: false, piece: None },
+      BoardSlot::Piece(t) => DrawableToken { wall: false, hover: false, piece: Some(t.into()) },
+    }
   }
 }
 
@@ -196,7 +202,7 @@ impl DrawState {
     if row == self.mouse.row as usize && col == self.mouse.col as usize {
       return;
     }
-    unimplemented!();
+    //unimplemented!();
   }
 }
 
