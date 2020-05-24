@@ -131,55 +131,60 @@ impl State {
 
     let location = Pos { row: row as i8, col: col as i8 };
     let mut dt = DrawableToken { wall: false, hover: false, piece: None};
-    match self.gamestate.current.at(location) {
-      BoardSlot::Empty => {
 
-        match (self.selected_piece, self.selected_move) {
-          (None, _) => {},
-          (Some(piece),  None) => {
+
+    match (self.selected_piece, self.selected_move) {
+      (None, _) => {
+        match self.gamestate.current.at(location) {
+          BoardSlot::Empty => {},
+          BoardSlot::Wall => { dt.wall = true; },
+          BoardSlot::Piece(t) => { dt.piece = Some(t.clone().into()); },
+        };
+      },
+      (Some(piece),  None) => {
+
+        match self.gamestate.current.at(location) {
+          BoardSlot::Empty => {
             if location == self.mouse && self.gamestate.current.open_line_along(piece, location) {
               dt.piece = Some(DrawableTeam::Red); // TODO FIXME AAAH
               dt.hover = true;
             }
           },
-          (Some(_), Some(mv)) => {
+          BoardSlot::Wall => { dt.wall = true; },
+          BoardSlot::Piece(t) => {
+            if piece == location {
+              dt.hover = true;
+            }
+            dt.piece = Some(t.clone().into()); },
+        };
+      },
+      (Some(piece), Some(mv)) => {
+
+        match self.gamestate.current.at(location) {
+          BoardSlot::Empty => {
             if location == self.mouse && self.gamestate.current.open_line_along(mv, location) {
               dt.wall = true;
               dt.hover = true;
             }
-          }
-        };
-
-
-
-      },
-      BoardSlot::Wall => {
-        dt.wall = true;
-      },
-      BoardSlot::Piece(t) => {
-
-
-        match (self.selected_piece, self.selected_move) {
-          (None, _) => {
-            dt.piece = Some(t.clone().into());
           },
-          (Some(piece),  None) => {
-            dt.piece = Some(t.clone().into());
+          BoardSlot::Wall => { dt.wall = true; },
+          BoardSlot::Piece(t) => {
             if piece == location {
               dt.hover = true;
-            }
-          },
-          (Some(piece), Some(_)) => {
-            dt.piece = Some(t.clone().into());
-            if piece == location && location == self.mouse {
-              dt.piece = None;
-              dt.wall = true;
-              dt.hover = true;
+              if self.mouse == location {
+                dt.wall = true;
+              } else {
+                dt.piece = Some(t.clone().into());
+              }
+            } else {
+              dt.piece = Some(t.clone().into());
             }
           }
         };
-      },
+
+      }
     };
+
     return dt;
   }
 }
