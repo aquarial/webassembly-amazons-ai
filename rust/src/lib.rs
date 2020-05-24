@@ -71,6 +71,8 @@ impl State {
     log(&format!("State.mouse_click({}, {}) out of [1, {}) range!",
       row, col, self.size()));
     }
+
+    self.drawstate.mouse_click(row as i8, col as i8);
     /*
 
     let at = gameboard.atPos(tpos);
@@ -125,14 +127,13 @@ impl State {
 */
   }
 
-  pub fn mouse_move(&self, row: f64, col: f64) {
+  pub fn mouse_move(&mut self, row: f64, col: f64) {
     if !is_int_in_range(row, (1.0, self.size() as f64))
       || !is_int_in_range(col, (1.0, self.size() as f64)) {
       log(&format!("State.mouse_move({}, {}) out of [1, {}) range!",
         row, col, self.size()));
     }
-    self.drawstate.mouse_move(row as usize, col as usize);
-    // unimplemented!();
+    self.drawstate.mouse_move(row as i8, col as i8);
   }
 
   pub fn token(&self, row: f64, col: f64) -> DrawableToken {
@@ -142,8 +143,6 @@ impl State {
         row, col, self.size()));
     }
 
-    // unimplemented!();
-    // self.drawstate.board[row as usize][col as usize]
     match self.gamestate.current.board[row as usize][col as usize] {
       BoardSlot::Empty => DrawableToken { wall: false, hover: false, piece: None },
       BoardSlot::Wall => DrawableToken { wall: true, hover: false, piece: None },
@@ -201,13 +200,35 @@ impl DrawState {
     self.selected_move = None;
   }
 
-  pub fn mouse_move(&self, row: usize, col: usize) {
-    if row == self.mouse.row as usize && col == self.mouse.col as usize {
-      return;
-    }
-    //unimplemented!();
+  pub fn mouse_move(&mut self, row: i8, col: i8) {
+    self.mouse.row = row;
+    self.mouse.col = col;
+  }
+
+  pub fn mouse_click(&mut self, row: i8, col: i8) -> Option<Move> {
+    let clicked = Pos { row: row, col: col };
+
+    match (self.selected_piece, self.selected_move) {
+      (None, _) => {
+        self.selected_piece = Some(clicked);
+        self.selected_move = None;
+      },
+      (_,  None) => {
+        self.selected_move = Some(clicked);
+      },
+      (Some(piece), Some(mv)) => {
+        self.clear_selected();
+        return Some(Move {
+          old_pos: piece,
+          new_pos: mv,
+          new_shot: clicked,
+        });
+      }
+    };
+    return None;
   }
 }
+
 
 fn is_int_in_range(val: f64, range: (f64, f64)) -> bool {
   if !(range.0 <= val && val <= range.1) {
