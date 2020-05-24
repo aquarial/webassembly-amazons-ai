@@ -92,7 +92,9 @@ impl State {
         }
       },
       (Some(piece), Some(mv)) => {
-        if piece == clicked || self.gamestate.current.open_line_along(mv, clicked) {
+        self.gamestate.current.swap_pos(piece, mv); // swap
+        if self.gamestate.current.open_line_along(mv, clicked) {
+          self.gamestate.current.swap_pos(piece, mv); // undo-swap
           self.clear_selected();
           self.gamestate.player_move(Move {
             old_pos: piece,
@@ -101,6 +103,7 @@ impl State {
           });
           return;
         }
+        self.gamestate.current.swap_pos(piece, mv); // undo-swap
       }
     };
 
