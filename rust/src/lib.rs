@@ -120,18 +120,65 @@ impl State {
     self.mouse.col = col as i8;
   }
 
-  pub fn token(&self, row: f64, col: f64) -> DrawableToken {
+  pub fn token(&mut self, row: f64, col: f64) -> DrawableToken {
     if !is_int_in_range(row, (1.0, self.size() as f64))
       || !is_int_in_range(col, (1.0, self.size() as f64)) {
       log(&format!("State.token({}, {}) out of [1, {}) range!",
         row, col, self.size()));
     }
 
-    match self.gamestate.current.board[row as usize][col as usize] {
-      BoardSlot::Empty => DrawableToken { wall: false, hover: false, piece: None },
-      BoardSlot::Wall => DrawableToken { wall: true, hover: false, piece: None },
-      BoardSlot::Piece(t) => DrawableToken { wall: false, hover: false, piece: Some(t.into()) },
-    }
+    let location = Pos { row: row as i8, col: col as i8 };
+    let mut dt = DrawableToken { wall: false, hover: false, piece: None};
+    match self.gamestate.current.at(location) {
+      BoardSlot::Empty => {
+
+        match (self.selected_piece, self.selected_move) {
+          (None, _) => {},
+          (Some(piece),  None) => {
+            if location == self.mouse && self.gamestate.current.open_line_along(piece, location) {
+              dt.piece = Some(DrawableTeam::Red); // TODO FIXME AAAH
+              dt.hover = true;
+            }
+          },
+          (Some(_), Some(mv)) => {
+            if location == self.mouse && self.gamestate.current.open_line_along(mv, location) {
+              dt.wall = true;
+              dt.hover = true;
+            }
+          }
+        };
+
+
+
+      },
+      BoardSlot::Wall => {
+        dt.wall = true;
+      },
+      BoardSlot::Piece(t) => {
+
+
+        match (self.selected_piece, self.selected_move) {
+          (None, _) => {
+            dt.piece = Some(t.clone().into());
+          },
+          (Some(piece),  None) => {
+            dt.piece = Some(t.clone().into());
+            if piece == location {
+              dt.hover = true;
+            }
+          },
+          (Some(piece), Some(_)) => {
+            dt.piece = Some(t.clone().into());
+            if piece == location && location == self.mouse {
+              dt.piece = None;
+              dt.wall = true;
+              dt.hover = true;
+            }
+          }
+        };
+      },
+    };
+    return dt;
   }
 }
 
