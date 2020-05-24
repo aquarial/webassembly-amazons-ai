@@ -40,12 +40,15 @@ impl State {
   }
 
   pub fn size(&self) -> usize {
-    self.gamestate.current.size()
+    // remember: 8x8 board is internally a 10x10 with walls around it
+    // so -2 to give the illusion it's a clear 8x8
+    self.gamestate.current.size() - 2
   }
 
   pub fn new_game(&mut self) { 
     self.drawstate.clear_selected();
     self.gamestate.new_game();
+    log(&self.gamestate.current.pprint());
   }
 
   pub fn ai_move(&mut self) {
@@ -168,8 +171,8 @@ impl From<Team> for DrawableTeam {
 #[derive(Clone, Copy, Debug)]
 pub struct DrawableToken {
   pub wall: bool,
-  pub piece: DrawableTeam,
   pub hover: bool,
+  pub piece: Option<DrawableTeam>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
