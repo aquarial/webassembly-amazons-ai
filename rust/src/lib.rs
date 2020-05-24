@@ -149,7 +149,9 @@ impl State {
         match self.gamestate.current.at(location) {
           BoardSlot::Empty => {
             if location == self.mouse && self.gamestate.current.open_line_along(piece, location) {
-              dt.piece = Some(DrawableTeam::Red); // TODO FIXME AAAH
+              if let BoardSlot::Piece(t) = self.gamestate.current.at(piece) {
+                dt.piece = Some(t.clone().into());
+              }
               dt.hover = true;
             }
           },
@@ -170,20 +172,18 @@ impl State {
             if location == self.mouse && self.gamestate.current.open_line_along(mv, location) {
               dt.wall = true;
               dt.hover = true;
+            } else if location == piece {
+              //  after selecting a move, should the original piece still be highlighted?
+              // dt.piece = Some(DrawableTeam::Red); // TODO FIXME AAAH
+              // dt.hover = true;
             }
           },
           BoardSlot::Wall => { dt.wall = true; },
           BoardSlot::Piece(t) => {
             if location == mv {
               dt.hover = true;
-              if location == self.mouse {
-                dt.wall = true;
-              } else {
-                dt.piece = Some(t.clone().into());
-              }
-            } else {
-              dt.piece = Some(t.clone().into());
             }
+            dt.piece = Some(t.clone().into());
           }
         };
 
