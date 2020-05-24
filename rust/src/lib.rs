@@ -160,6 +160,8 @@ impl State {
       },
       (Some(piece), Some(mv)) => {
 
+        self.gamestate.current.swap_pos(piece, mv);
+
         match self.gamestate.current.at(location) {
           BoardSlot::Empty => {
             if location == self.mouse && self.gamestate.current.open_line_along(mv, location) {
@@ -169,9 +171,9 @@ impl State {
           },
           BoardSlot::Wall => { dt.wall = true; },
           BoardSlot::Piece(t) => {
-            if piece == location {
+            if location == mv {
               dt.hover = true;
-              if self.mouse == location {
+              if location == self.mouse {
                 dt.wall = true;
               } else {
                 dt.piece = Some(t.clone().into());
@@ -182,6 +184,7 @@ impl State {
           }
         };
 
+        self.gamestate.current.swap_pos(piece, mv);
       }
     };
 
