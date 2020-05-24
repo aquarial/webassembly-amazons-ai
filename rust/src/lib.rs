@@ -85,73 +85,29 @@ impl State {
 
     match (self.selected_piece, self.selected_move) {
       (None, _) => {
-        self.selected_piece = Some(clicked);
+        if let BoardSlot::Piece(t) = self.gamestate.current.at(clicked) {
+          if *t == self.gamestate.turn {
+            self.selected_piece = Some(clicked);
+          }
+        }
       },
-      (_,  None) => {
-        self.selected_move = Some(clicked);
+      (Some(piece),  None) => {
+        if self.gamestate.current.open_line_along(piece, clicked) {
+          self.selected_move = Some(clicked);
+        }
       },
       (Some(piece), Some(mv)) => {
-        self.clear_selected();
-        let mv = Move {
-          old_pos: piece,
-          new_pos: mv,
-          new_shot: clicked,
-        };
+        if piece == clicked || self.gamestate.current.open_line_along(mv, clicked) {
+          self.clear_selected();
+          let mv = Move {
+            old_pos: piece,
+            new_pos: mv,
+            new_shot: clicked,
+          };
+          self.gamestate.player_move(mv);
+        }
       }
     };
-
-    /*
-
-    let at = gameboard.atPos(tpos);
-    if (at instanceof Player) {
-      if (at === drawstate.piece) {
-        if (drawstate.move != null) {
-          // placing a stone on the location of the moving piece
-          gamestate.addMove(drawstate.piece, drawstate.move, tpos)
-          gameboard.makePlayerMove(drawstate.piece, drawstate.move, tpos)
-          drawstate.piece = null
-          drawstate.move = null;
-        } else {
-          // re-click to deselect
-          drawstate.piece = null
-        }
-      } else {
-        drawstate.piece = null;
-        if (at.team === gamestate.next_to_go) {
-          drawstate.piece = at;
-        }
-        drawstate.move = null;
-      }
-    } else if (at != null) {
-      drawstate.piece = null;
-      drawstate.move = null;
-    }
-
-    if (at == undefined) {
-      if (drawstate.piece == null) { // select piece
-        // make pieces flash
-      } else if (drawstate.move == null) { // move pieces
-        if (gameboard.openLineTo(drawstate.piece, tpos)) {
-          drawstate.move = tpos;
-        } else {
-          drawstate.piece = null;
-        }
-      } else { // place stone
-        gameboard.blocked.set(drawstate.piece.pos.str(), undefined);
-        if (gameboard.openLineTo(drawstate.move, tpos)) {
-          gameboard.blocked.set(drawstate.piece.pos.str(), drawstate.piece);
-          gamestate.addMove(drawstate.piece, drawstate.move, tpos)
-          gameboard.makePlayerMove(drawstate.piece, drawstate.move, tpos)
-          drawstate.piece = null;
-          drawstate.move = null;
-        } else {
-          gameboard.blocked.set(drawstate.piece.pos.str(), drawstate.piece);
-          drawstate.piece = null;
-          drawstate.move = null;
-        }
-      }
-    }
-*/
   }
 
   pub fn mouse_move(&mut self, row: f64, col: f64) {
