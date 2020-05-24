@@ -84,30 +84,32 @@ impl State {
     let clicked = Pos { row: row as i8, col: col as i8 };
 
     match (self.selected_piece, self.selected_move) {
-      (None, _) => {
-        if let BoardSlot::Piece(t) = self.gamestate.current.at(clicked) {
-          if *t == self.gamestate.turn {
-            self.selected_piece = Some(clicked);
-          }
-        }
-      },
+      (None, _) => {},
       (Some(piece),  None) => {
         if self.gamestate.current.open_line_along(piece, clicked) {
           self.selected_move = Some(clicked);
+          return;
         }
       },
       (Some(piece), Some(mv)) => {
         if piece == clicked || self.gamestate.current.open_line_along(mv, clicked) {
           self.clear_selected();
-          let mv = Move {
+          self.gamestate.player_move(Move {
             old_pos: piece,
             new_pos: mv,
             new_shot: clicked,
-          };
-          self.gamestate.player_move(mv);
+          });
+          return;
         }
       }
     };
+
+    self.clear_selected();
+    if let BoardSlot::Piece(t) = self.gamestate.current.at(clicked) {
+      if *t == self.gamestate.turn {
+        self.selected_piece = Some(clicked);
+      }
+    }
   }
 
   pub fn mouse_move(&mut self, row: f64, col: f64) {
