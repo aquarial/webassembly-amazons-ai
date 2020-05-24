@@ -151,17 +151,20 @@ impl Board {
     &mut self.board[pos.row as usize][pos.col as usize]
   }
 
+  pub fn swap_pos(&mut self, a: Pos, b: Pos) {
+    //std::mem::swap(self.at(a), self.at(b));
+    let t = self.at(a).clone();
+    *self.at(a) = self.at(b).clone();
+    *self.at(b) = t;
+  }
+
   pub fn apply_move(&mut self, mv: Move) {
-    let t = self.at(mv.old_pos).clone();
-    *self.at(mv.old_pos) = BoardSlot::Empty;
-    *self.at(mv.new_pos) = t;
+    self.swap_pos(mv.old_pos, mv.new_pos);
     *self.at(mv.new_shot) = BoardSlot::Wall;
   }
 
   pub fn un_apply_move(&mut self, mv: Move) {
-    let t = self.at(mv.new_pos).clone();
-    *self.at(mv.new_pos) = BoardSlot::Empty;
-    *self.at(mv.old_pos) = t;
     *self.at(mv.new_shot) = BoardSlot::Empty;
+    self.swap_pos(mv.old_pos, mv.new_pos);
   }
 }
