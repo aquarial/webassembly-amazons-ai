@@ -112,10 +112,10 @@ impl Board {
       }
     }
 
-    tokens[2][2] = BoardSlot::Piece(Team::Red);
-    tokens[2][4] = BoardSlot::Piece(Team::Red);
-    tokens[4][2] = BoardSlot::Piece(Team::Blue);
-    tokens[4][4] = BoardSlot::Piece(Team::Blue);
+    tokens[3][3] = BoardSlot::Piece(Team::Red);
+    tokens[3][6] = BoardSlot::Piece(Team::Red);
+    tokens[6][3] = BoardSlot::Piece(Team::Blue);
+    tokens[6][6] = BoardSlot::Piece(Team::Blue);
 
     return Board {
       board: tokens,  
