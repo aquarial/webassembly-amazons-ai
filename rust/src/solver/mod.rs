@@ -31,9 +31,9 @@ impl Amazons {
   }
 
   pub fn new_game(&mut self) {
-    self.turn = Team::Red;
-    self.current = Board::new();
     self.history.push(HistoryMove::NewGame(self.current.clone()));
+    self.current = Board::new();
+    self.turn = Team::Red;
   }
 
   /// Revert the last move.
@@ -41,9 +41,11 @@ impl Amazons {
     match self.history.pop() {
       Some(HistoryMove::NewGame(b)) => {
         self.current = b;
+        self.turn = Team::Red;
       }
       Some(HistoryMove::Move(m)) => {
         self.current.un_apply_move(m);
+        self.turn = self.turn.other();
       }
       None => {}
     }
