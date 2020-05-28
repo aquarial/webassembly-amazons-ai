@@ -1,4 +1,5 @@
 # Amazons AI - WebAssembly
 
+Playable at: https://www.upl.cs.wisc.edu/games/amazonsai/index.html
 
-### Forked from https://github.com/rustwasm/wasm-pack-template.git
+project structure started from: https://github.com/rustwasm/wasm-pack-template.git
