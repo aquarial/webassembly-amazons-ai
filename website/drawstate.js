@@ -26,12 +26,25 @@ export function drawWasmTiles(c2d, state, tilesize) {
       }
 
       if (at.piece != null) {
-        if (at.piece == wasm.DrawableTeam.Red) {
-          c2d.fillStyle = team_color('red', at.hover);
+        if (at.piece == wasm.DrawableTeam.Gray) {
+          c2d.fillStyle = team_color('block', at.hover);
+          drawOneShape(c2d, tilesize, y, x, "circle")
         } else {
-          c2d.fillStyle = team_color('blue', at.hover);
+
+          c2d.fillStyle = 'white';
+          drawOneShape(c2d, tilesize, y, x, "circle outline")
+
+          if (at.piece == wasm.DrawableTeam.Red) {
+            c2d.fillStyle = team_color('red', at.hover);
+          }
+          if (at.piece == wasm.DrawableTeam.Blue) {
+            c2d.fillStyle = team_color('blue', at.hover);
+          }
+
+          drawOneShape(c2d, tilesize, y, x, "circle")
+
+
         }
-        drawOneShape(c2d, tilesize, y, x, "circle")
       }
 
       at.free();
