@@ -165,8 +165,11 @@ impl State {
           BoardSlot::Piece(t) => {
             if piece == location {
               dt.hover = true;
+              dt.piece = Some(DrawableTeam::Gray);
+            } else {
+              dt.piece = Some(t.clone().into());
             }
-            dt.piece = Some(t.clone().into()); },
+          },
         };
       },
 
@@ -181,8 +184,8 @@ impl State {
               dt.hover = true;
             } else if location == piece {
               //  after selecting a move, should the original piece still be highlighted?
-              // dt.piece = Some(DrawableTeam::Red); // TODO FIXME AAAH
-              // dt.hover = true;
+              dt.piece = Some(DrawableTeam::Gray);
+              dt.hover = true;
             }
           },
           BoardSlot::Wall => { dt.wall = true; },
@@ -206,7 +209,7 @@ impl State {
 #[wasm_bindgen]
 #[derive(Clone, Copy, Debug)]
 pub enum DrawableTeam {
-  Red, Blue,
+  Red, Blue, Gray,
 }
 impl From<Team> for DrawableTeam {
   fn from(t: Team) -> DrawableTeam {
