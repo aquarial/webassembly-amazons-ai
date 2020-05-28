@@ -85,12 +85,14 @@ impl State {
 
     match (self.selected_piece, self.selected_move) {
       (None, _) => {},
+
       (Some(piece),  None) => {
         if self.gamestate.current.open_line_along(piece, clicked) {
           self.selected_move = Some(clicked);
           return;
         }
       },
+
       (Some(piece), Some(mv)) => {
         self.gamestate.current.swap_pos(piece, mv); // swap
         if self.gamestate.current.open_line_along(mv, clicked) {
@@ -144,8 +146,8 @@ impl State {
           BoardSlot::Piece(t) => { dt.piece = Some(t.clone().into()); },
         };
       },
-      (Some(piece),  None) => {
 
+      (Some(piece),  None) => {
         match self.gamestate.current.at(location) {
           BoardSlot::Empty => {
             if location == self.mouse && self.gamestate.current.open_line_along(piece, location) {
@@ -163,6 +165,7 @@ impl State {
             dt.piece = Some(t.clone().into()); },
         };
       },
+
       (Some(piece), Some(mv)) => {
 
         self.gamestate.current.swap_pos(piece, mv);
