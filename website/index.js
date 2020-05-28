@@ -2,7 +2,6 @@
 /* jshint -W069, esversion:6 */
 
 import * as wasm from "amazons-ai-webassembly";
-import { GameBoard, Player, GameState, Pos } from "./game.js";
 import { drawWasmTiles } from "./drawstate.js";
 
 /** @type {((dt: number, totaltime: number) => void)[]} */
