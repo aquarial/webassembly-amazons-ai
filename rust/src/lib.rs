@@ -91,6 +91,10 @@ impl State {
           self.selected_move = Some(clicked);
           return;
         }
+        if piece == clicked {
+          self.clear_selected();
+          return;
+        }
       },
 
       (Some(piece), Some(mv)) => {
